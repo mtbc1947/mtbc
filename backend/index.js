@@ -5,17 +5,47 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import mailjet from "node-mailjet";
+import imagesRouter from "./routes/images.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-const mailjetClient = mailjet.connect(
+const IK_PRIVATE_KEY = process.env.IK_PRIVATE_KEY;
+
+const mailjetClient = mailjet.apiConnect(
     process.env.MJ_APIKEY_PUBLIC,
-    process.env.MJ_APIKEY_PRIVATE
+    process.env.MJ_APIKEY_PRIVATE,
+    {
+        config: {},
+        options: {},
+    }
 );
 
-app.use(cors());
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "*",
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Content-Type"],
+    })
+);
+
 app.use(bodyParser.json());
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+});
+
+app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.url}`);
+    next();
+});
+
+app.use("/api/images", imagesRouter);
 
 app.post("/send-email", async (req, res) => {
     const { firstName, lastName, email, phone, message } = req.body;
@@ -54,6 +84,22 @@ app.post("/send-email", async (req, res) => {
         console.error("Mailjet error:", error);
         res.status(500).json({ message: "Failed to send email." });
     }
+});
+
+app.get("/test", async (req, res) => {
+    console.log("Got /test");
+    console.log("Headers", req.headers);
+    console.log("Body", req.body);
+    res.status(200).json({ message: "OK" });
+});
+
+app.use((error, req, res, next) => {
+    res.status(error.status || 500);
+    res.json({
+        message: error.message || "Soemthing went wrong",
+        status: error.status,
+        stack: error.stack,
+    });
 });
 
 app.listen(PORT, () => {
