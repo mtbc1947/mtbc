@@ -28,7 +28,7 @@ const ContactUsPage = () => {
     e.preventDefault();
     setStatus(null);
     try {
-      const res = await fetch('http://localhost:4000/send-email', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/send-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
