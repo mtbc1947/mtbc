@@ -105,7 +105,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {open && (
-        <nav className="flex flex-col md:hidden mt-1 gap-2 text-base text-black font-medium w-full">
+        <nav className="flex flex-col bg-white md:hidden mt-1 gap-2 text-base text-black font-medium w-full">
           {[
             {
               label: "About Us",

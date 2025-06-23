@@ -1,10 +1,16 @@
 import dotenv from "dotenv";
-dotenv.config();
+const envFile =
+    process.env.NODE_ENV === "production" ? ".env.production" : ".env";
+dotenv.config({ path: envFile });
 
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import mailjet from "node-mailjet";
+import connectDB from "./lib/connectDB.js";
+
+import referenceRouter from "./routes/reference.route.js";
+
 import imagesRouter from "./routes/images.js";
 
 const app = express();
@@ -21,9 +27,11 @@ const mailjetClient = mailjet.apiConnect(
     }
 );
 
+const allowedOrigins = ["http://localhost:5173", process.env.CLIENT_URL || "*"];
+
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || "*",
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
         allowedHeaders: ["Content-Type"],
     })
@@ -44,6 +52,8 @@ app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url}`);
     next();
 });
+
+app.use("/reference", referenceRouter);
 
 app.use("/api/images", imagesRouter);
 
@@ -103,5 +113,14 @@ app.use((error, req, res, next) => {
 });
 
 app.listen(PORT, () => {
+    connectDB();
     console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
+
+process.on("uncaughtException", (err) => {
+    console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
