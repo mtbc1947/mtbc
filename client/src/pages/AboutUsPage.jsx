@@ -8,7 +8,7 @@ const AboutUsPage = () => {
   
   useEffect(() => {
     const getData = async () => {
-      const data = await getReferenceData("About%20Us");
+      const data = await getReferenceData("AboutUs");
       // @ts-ignore
       setStrings(data);
     };
@@ -71,7 +71,7 @@ const AboutUsPage = () => {
           As well as the competitive side of the club, we also pride ourselves
           on our informality and we hold a number of events each week to
           encourage this aspect.{" "}
-          <a href="/events" className="text-blue-700 underline">Click here</a> for more details of these events.
+          <a href="/social" className="text-blue-700 underline">Click here</a> for more details of these events.
         </p>
 
         <h2 className="text-xl font-bold mt-8 mb-2">DATA PRIVACY</h2>

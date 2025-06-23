@@ -18,6 +18,7 @@ import ThamesValleyPage from './pages/ThamesValleyPage.jsx';
 import NoticeBoardPage from './pages/NoticeBoardPage.jsx';
 import NewsReportsPage from './pages/NewsReportsPage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
+import SocialPage from './pages/SocialPage.jsx';
 import LocationPage from './pages/LocationPage.jsx';
 import ContactUsPage from './pages/ContactUsPage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
@@ -54,6 +55,11 @@ const router = createBrowserRouter([
       {
         path: "/openDay",
         element: <OpenDayPage />,
+        errorElement: <RouteError />,
+      },
+      {
+        path: "/social",
+        element: <SocialPage />,
         errorElement: <RouteError />,
       },
       {
