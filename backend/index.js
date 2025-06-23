@@ -114,7 +114,8 @@ app.use((error, req, res, next) => {
 
 app.listen(PORT, () => {
     connectDB();
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
+    console.log(`Listening for client_url ${process.env.CLIENT_URL}`);
+    console.log(`🚀 Server running on port: ${PORT}`);
 });
 
 process.on("uncaughtException", (err) => {

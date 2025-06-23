@@ -14,7 +14,8 @@ const AboutUsPage = () => {
     };
     getData();
   }, []);
-
+  console.log("Strings");
+  console.log(strings);
   const wFullFee = strings[0] || "";
   const wJoiningFee = strings[1] || "";
   const wSocialFee = strings[2] || "";
