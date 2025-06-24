@@ -1,5 +1,5 @@
 export const getReferenceData = async (pWebPage) => {
-    console.log("getReferenceData", pWebPage);
+    console.log("getReferenceData v2", pWebPage);
 
     try {
         let wReply = [];
