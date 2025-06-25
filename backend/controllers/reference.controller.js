@@ -7,8 +7,9 @@ export const getReferences = async (req, res) => {
 };
 
 export const getPageReferences = async (req, res) => {
-    console.log("reference.controller, getPageReferences", req.params.webPage);
-    const references = await Reference.find({ webPage: req.params.webPage });
+    let wWebPage = req.params.webPage;
+    console.log("reference.controller, getPageReferences", wWebPage);
+    const references = await Reference.find({ webPage: wWebPage });
     console.log(`Found ${references.length} records`);
     res.status(200).json(references);
 };

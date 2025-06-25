@@ -26,27 +26,32 @@ const mailjetClient = mailjet.apiConnect(
         options: {},
     }
 );
+app.use(bodyParser.json());
 
-const allowedOrigins = ["http://localhost:5173", process.env.CLIENT_URL || "*"];
+const allowedOrigins =
+    process.env.NODE_ENV === "production"
+        ? [process.env.CLIENT_URL]
+        : ["http://localhost:5173"];
 
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like mobile apps, curl, Postman)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            } else {
+                return callback(
+                    new Error("CORS not allowed from this origin"),
+                    false
+                );
+            }
+        },
         methods: ["GET", "POST"],
         allowedHeaders: ["Content-Type"],
+        credentials: true, // Optional: enable if using cookies/sessions
     })
 );
-
-app.use(bodyParser.json());
-
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
 
 app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url}`);
