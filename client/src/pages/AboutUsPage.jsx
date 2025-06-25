@@ -1,6 +1,11 @@
 import React from "react";
 import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
+
 import { getReferenceData } from "../utils/getReferenceData.js";
+
+import clubFront from '../assets/club_front.jpg';
+import club from '../assets/match1.jpg';
 
 const AboutUsPage = () => {
   const [strings, setStrings] = useState([]);
@@ -24,8 +29,11 @@ const AboutUsPage = () => {
   const wMatchFee = strings[5] || "";
   
   return (
-    <div className="bg-[url('/grass.jpg')] bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans">
-      <div className="bg-white/80 p-6 md:p-10 rounded-md shadow-lg max-w-5xl mx-auto">
+    <div 
+      className="bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans"
+      style={{ backgroundImage: `url(${clubFront})` }}
+    >
+      <div className="bg-white/70 p-6 md:p-10 rounded-md shadow-lg max-w-5xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">MAIDENHEAD TOWN BOWLS CLUB</h1>
         <p className="mb-4">
           MAIDENHEAD TOWN BOWLS CLUB prides itself on making new members
@@ -71,28 +79,28 @@ const AboutUsPage = () => {
           As well as the competitive side of the club, we also pride ourselves
           on our informality and we hold a number of events each week to
           encourage this aspect.{" "}
-          <a href="/social" className="text-blue-700 underline">Click here</a> for more details of these events.
+          <Link to="/social" className="text-blue-700 underline">Click here</Link> for more details of these events.
         </p>
 
         <h2 className="text-xl font-bold mt-8 mb-2">DATA PRIVACY</h2>
         <p className="mb-4">
           This site uses cookies as well as holding some information on its
           members. To view the club's privacy policy,{" "}
-          <a href="/privacy" className="text-blue-700 underline">click here</a>.
+          <Link to="/privacy" className="text-blue-700 underline">click here</Link>.
         </p>
 
         <h2 className="text-xl font-bold mt-8 mb-2">APPLICATION FORM</h2>
         <p className="mb-4">
           If you would like to join, a Membership Application Form is available
           on request from our Club Secretary or if you would like to have a
-          chat first, please use the <a href="/contactUs" className="text-blue-700 underline">Contact Form</a> to get someone to contact
+          chat first, please use the <Link to="/contactUs" className="text-blue-700 underline">Contact Form</Link> to get someone to contact
           you or email the club <a href="mailto:maidenheadtownbc@gmail.com" className="text-blue-700 underline">maidenheadtownbc@gmail.com</a>
         </p>
 
         <div className="mt-6 flex justify-center">
           <img
-            src="/images/club_photo.jpg"
-            alt=""
+            src={club}
+            alt="club"
             className="rounded shadow-md max-w-xs md:max-w-md w-full"
           />
         </div>

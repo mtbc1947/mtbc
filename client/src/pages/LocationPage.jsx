@@ -1,8 +1,13 @@
 import React from 'react';
 
+import locationBackground from '../assets/green1.jpg';
+
 const LocationPage = () => {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-8">
+    <div 
+      className="max-w-6xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-8"
+      style={{ backgroundImage: `url(${locationBackground})` }}
+    >
       {/* Left Column */}
       <div className="space-y-8">
         {/* Club Info */}

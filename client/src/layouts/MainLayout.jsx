@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+import mainBackground from '../assets/green1.jpg';
+
 const MainLayout = () => {
   const [isDimmed, setIsDimmed] = useState(true);
 
@@ -14,7 +16,8 @@ const MainLayout = () => {
     <div className="relative min-h-screen flex flex-col text-black">
       {/* Background Image */}
       <div
-        className={`absolute inset-0 bg-[url('/green1.jpg')] bg-cover bg-center z-0`}
+        className={`absolute inset-0 g-cover bg-center z-0`}
+        style={{ backgroundImage: `url(${mainBackground})` }}
       />
 
       {/* Optional Dark Overlay */}

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoMdArrowDropdown } from "react-icons/io";
 
+import logo from "../assets/mtbc_3.jpg";
+
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [dropdown, setDropdown] = useState(null);
@@ -15,7 +17,7 @@ const Navbar = () => {
     <header className="bg-white shadow-md py-2 px-6 h-20 md:h-24 relative z-50">
       <div className="flex md:items-center">
         <Link to="/">
-          <img src="/mtbc_3.jpg" alt="Logo" className="h-16 md:h-20 w-auto mr-4" />
+          <img src={logo} alt="Logo" className="h-16 md:h-20 w-auto mr-4" />
         </Link>
 
         <div className="flex flex-col justify-center w-full">

@@ -14,5 +14,8 @@
   "type": "module",
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "imagekitio-react": "^4.3.0"
   }
 }

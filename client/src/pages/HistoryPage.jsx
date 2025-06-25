@@ -1,12 +1,19 @@
 import React from "react";
+import { Link } from 'react-router-dom';
+
+import trophies from "../assets/prize1.jpg";
+import green1 from "../assets/green1.jpg";
 
 const HistoryPage = () => {
   return (
-    <div className="bg-[url('/grass.jpg')] bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans">
+    <div 
+      className="bg-[url('../assets/grass.jpg')] bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans"
+      style={{ backgroundImage: `url(${green1})` }}
+    >
       <div className="bg-white/80 p-6 md:p-10 rounded-md shadow-lg max-w-5xl mx-auto">
         <div className="flex justify-center mb-6">
           <img
-            src="/images/history_trophies.jpg"
+            src={trophies}
             alt="Trophies and Honour Board"
             className="rounded shadow-md max-w-full h-auto"
           />
@@ -30,9 +37,9 @@ const HistoryPage = () => {
 
         <p className="mb-4">
           You can see our past presidents by clicking{" "}
-          <a href="/presidents-gallery" className="text-blue-700 underline">
+          <Link to="/presidents-gallery" className="text-blue-700 underline">
             here to display the Presidents Gallery
-          </a>
+          </Link>
           .
         </p>
 

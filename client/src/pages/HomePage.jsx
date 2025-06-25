@@ -2,6 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+import homeBackground from '../assets/Home_2.jpg';
+import openDayImage from '../assets/OpenDay.jpg';
+import janYoneko from '../assets/jan_yoneko.jpg';
+
 const HomePage = () => {
   const navigate = useNavigate();
   const wOpeningTime = "10:00am";
@@ -14,7 +18,10 @@ const HomePage = () => {
   };
 
   return (
-    <div className="w-full flex-grow bg-[url('/Home_2.jpg')] bg-cover bg-center p-6 text-black">
+    <div
+      className="w-full flex-grow bg-cover bg-center p-6 text-black"
+      style={{ backgroundImage: `url(${homeBackground})` }}
+    >     
       {/* Top: Welcome Row */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-8">
         <h1 className="text-3xl font-bold text-black">Welcome to Our Club</h1>
@@ -40,7 +47,7 @@ const HomePage = () => {
             aria-label="Open Day Button"
           >
             <img
-              src="/OpenDay.jpg"
+              src={openDayImage}
               alt="Open Day"
               className="w-full h-full object-contain"
             />
@@ -75,8 +82,8 @@ const HomePage = () => {
               <br/>
             </div>
             <img
-              src="/linscott.jpg"
-              alt="Visual"
+              src={janYoneko}
+              alt="Visual 2"
               className="w-40 h-40 object-cover rounded-lg shadow-md hidden md:block"
             />
           </div>
