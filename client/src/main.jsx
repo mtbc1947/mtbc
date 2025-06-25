@@ -11,10 +11,7 @@ import OpenDayPage from './pages/OpenDayPage.jsx';
 import AboutUsPage from './pages/AboutUsPage.jsx';
 import HistoryPage from './pages/HistoryPage.jsx';
 import OfficersPage from './pages/OfficersPage.jsx';
-import KennetPage from './pages/KennetPage.jsx';
-import KLVPage from './pages/KLVPage.jsx';
-import RoyalShieldPage from './pages/RoyalShieldPage.jsx';
-import ThamesValleyPage from './pages/ThamesValleyPage.jsx';
+import TeamPage from './pages/TeamPage.jsx';
 import NoticeBoardPage from './pages/NoticeBoardPage.jsx';
 import NewsReportsPage from './pages/NewsReportsPage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
@@ -63,23 +60,8 @@ const router = createBrowserRouter([
         errorElement: <RouteError />,
       },
       {
-        path: "/kl/:teamKey",
-        element: <KennetPage />,
-        errorElement: <RouteError />,
-      },
-      {
-        path: "/klv/:teamKey",
-        element: <KLVPage />,
-        errorElement: <RouteError />,
-      },
-      {
-        path: "/rs/:teamKey",
-        element: <RoyalShieldPage />,
-        errorElement: <RouteError />,
-      },
-      {
-        path: "/tv/:teamKey",
-        element: <ThamesValleyPage />,
+        path: "/team/:league/:team",
+        element: <TeamPage />,
         errorElement: <RouteError />,
       },
       {

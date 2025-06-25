@@ -17,6 +17,7 @@ const SocialPage = () => {
     };
     getData();
   }, []);
+
   console.log("Strings");
   console.log(strings);
   /**
@@ -29,13 +30,19 @@ const SocialPage = () => {
   */
 
   return (
-    <div 
-      className="bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans"
-      style={{ backgroundImage: `url(${clubFront})` }}
-    >
-      SocialPage
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-gray-200 rounded-2xl shadow-md p-8 w-full max-w-md">
+        <h2 className="text-xl font-semibold mb-4 text-center">Social Page</h2>
+        <ul className="space-y-3">
+          {strings.map((link, index) => (
+            <li key={index} className="flex justify-between">
+              <span className="text-blue-600 underline">{link}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  )
+  );
 }
 
 export default SocialPage

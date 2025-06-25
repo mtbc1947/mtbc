@@ -1,6 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+
+import { getReferenceData } from "../utils/getReferenceData.js";
 
 import homeBackground from '../assets/Home_2.jpg';
 import openDayImage from '../assets/OpenDay.jpg';
@@ -8,10 +11,22 @@ import janYoneko from '../assets/jan_yoneko.jpg';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const wOpeningTime = "10:00am";
-  const wOpeningDays = " 7 days a week";
-  const wGreenFees = "no green fees";
-  const wOpenDayMkr = false;
+  const [strings, setStrings] = useState([]);
+  
+  useEffect(() => {
+    const getData = async () => {
+      const data = await getReferenceData("Home");
+      // @ts-ignore
+      setStrings(data);
+    };
+    getData();
+  }, []);
+  
+  const wOpenHours = strings[0] || ""; //"10:00am";
+  const wOpenDays = strings[1] || ""; //" 7 days a week";
+  const wGreenFees = strings[2] || ""; //"no green fees";
+  const wOpenDay = strings[3] || ""; //false;
+  const wOpenDayMkr = (wOpenDay === "Y") ? true : false;
 
   const handleImageButtonClick = () => {
     navigate('/openDay');
@@ -88,7 +103,7 @@ const HomePage = () => {
             />
           </div>
           <p>
-            The greens are open from {wOpeningTime},{wOpeningDays}, until dusk,
+            The greens are open from {wOpenHours}, {wOpenDays}, until dusk,
              and Members are welcome to come along for a roll-up and use the
               Green whenever it is available, with {wGreenFees}.          
           </p>

@@ -8,8 +8,9 @@ import clubFront from '../assets/club_front.jpg';
 import club from '../assets/match1.jpg';
 
 const AboutUsPage = () => {
-  const [strings, setStrings] = useState([]);
   const wYear = new Date().getFullYear();
+  
+  const [strings, setStrings] = useState([]);
   
   useEffect(() => {
     const getData = async () => {
@@ -19,8 +20,7 @@ const AboutUsPage = () => {
     };
     getData();
   }, []);
-  console.log("Strings");
-  console.log(strings);
+
   const wFullFee = strings[0] || "";
   const wJoiningFee = strings[1] || "";
   const wSocialFee = strings[2] || "";
