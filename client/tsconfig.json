@@ -6,11 +6,16 @@
         "moduleResolution": "node",
         "baseUrl": "src",
         "paths": {
+            "components": ["components/index"],
             "components/*": ["components/*"],
-            "utilities/*": ["utilities/*"],
-            "assets/*": ["assets/*"],
+            "layouts": ["layouts/index"],
             "layouts/*": ["layouts/*"],
-            "pages/*": ["pages/*"]
+            "pages": ["pages/index"],
+            "pages/*": ["pages/*"],
+            "utilities": ["utilities/index"],
+            "utilities/*": ["utilities/*"],
+            "assets": ["assets/index"],
+            "assets/*": ["assets/*"]
         },
         "strict": true,
         "esModuleInterop": true,

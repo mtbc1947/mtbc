@@ -4,28 +4,28 @@ import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
-import MainLayout from 'layouts';
+import { MainLayout } from 'layouts';
+import { ErrorBoundary } from 'components';
+import { RouteError }   from 'components';
 
-import HomePage from 'pages';
-import OpenDayPage from 'pages';
-import AboutUsPage from 'pages';
-import HistoryPage from 'pages';
-import OfficersPage from 'pages';
-import TeamPage from 'pages';
-import NoticeBoardPage from 'pages';
-import NewsReportsPage from 'pages';
-import PrivacyPage from 'pages';
-import SocialPage from 'pages';
-import LocationPage from 'pages';
-import ContactUsPage from 'pages';
-import BookingPage from 'pages';
-import CountyPresidentsPage from 'pages';
-import PresidentsPage from 'pages';
-import AdminPage from 'pages';
-import MaintainDataPage from 'pages';
+import { HomePage } from 'pages';
+import { OpenDayPage } from 'pages';
+import { AboutUsPage } from 'pages';
+import { HistoryPage } from 'pages';
+import { OfficersPage } from 'pages';
+import { TeamPage } from 'pages';
+import { NoticeBoardPage } from 'pages';
+import { NewsReportsPage } from 'pages';
+import { PrivacyPage } from 'pages';
+import { SocialPage } from 'pages';
+import { LocationPage } from 'pages';
+import { ContactUsPage } from 'pages';
+import { BookingPage } from 'pages';
+import { CountyPresidentsPage } from 'pages';
+import { PresidentsPage } from 'pages';
+import { AdminPage } from 'pages';
+import { MaintainDataPage } from 'pages';
 
-import ErrorBoundary from 'components';
-import RouteError   from 'components';
 
 const router = createBrowserRouter([
   {

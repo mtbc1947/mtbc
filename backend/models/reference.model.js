@@ -13,7 +13,7 @@ const referenceSchema = new Schema(
             required: true,
         },
         name: {
-            type: [String],
+            type: String,
         },
         value: {
             type: String,

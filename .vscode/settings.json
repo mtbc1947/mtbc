@@ -1,0 +1,6 @@
+{
+    "typescript.tsdk": "client/node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.tsserver.projectRoot": "client",
+    "liveServer.settings.multiRootWorkspaceName": "mtbc3"
+}

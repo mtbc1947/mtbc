@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import SEO from '../components/SEO';
-import { getReferenceValuesByPage } from '../utilities';
+import { SEO } from 'components';
+import { getReferenceValuesByPage } from 'utilities';
 
-import clubFront from '../assets/club_front.jpg';
+import  clubFront  from 'assets/club_front.jpg';
 import club from '../assets/match1.jpg';
 
 const AboutUsPage: React.FC = () => {

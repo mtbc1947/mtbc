@@ -8,6 +8,13 @@ interface LocationState {
   error?: string;
 }
 
+type ReferenceItem = {
+  refKey: string;
+  webPage: string;
+  name: string;
+  value: string;
+};
+
 const AdminPage: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState | undefined;
@@ -16,6 +23,15 @@ const AdminPage: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [referenceData, setReferenceData] = useState<ReferenceItem[]>([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await getAllReferenceData();
+      setReferenceData(data);
+    };
+    getData();
+  }, []);
 
   useEffect(() => {
     if (state?.error) {
@@ -24,14 +40,25 @@ const AdminPage: React.FC = () => {
   }, [state]);
 
   const checkPassword = () => {
+    if (referenceData.length === 0) {
+      console.warn("Reference data not loaded yet.");
+      setError("System not ready. Try again shortly.");
+      return;
+    }
+    const refItem = referenceData.find( item => item.refKey === "SD035");
+    const VALID_TOKEN = refItem?.value ?? "";
+    console.log("Token = ", VALID_TOKEN);
     const VALID_PASSWORD = 'kathy'; // TODO: Replace with your real backend check
-    if (password === VALID_PASSWORD) {
+    if (password === VALID_TOKEN) {
       setIsAuthenticated(true);
       setError('');
     } else {
       setError('Incorrect password');
     }
   };
+  
+  console.log("Ref Data Array");
+  console.log(referenceData);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -64,10 +91,12 @@ const AdminPage: React.FC = () => {
               className="w-full p-2 border rounded"
             />
           </div>
-
           <button
             onClick={checkPassword}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            disabled={referenceData.length === 0}
+            className={`px-4 py-2 rounded text-white ${
+              referenceData.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
             Login
           </button>
