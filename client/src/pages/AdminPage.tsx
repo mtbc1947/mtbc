@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, Location } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { SEO } from 'components';
-
 import { getAllReferenceData } from 'utilities';
 
 interface LocationState {
@@ -24,13 +23,28 @@ const AdminPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [referenceData, setReferenceData] = useState<ReferenceItem[]>([]);
+  const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
 
+  // Load reference data from localStorage or backend
   useEffect(() => {
-    const getData = async () => {
-      const data = await getAllReferenceData();
-      setReferenceData(data);
-    };
-    getData();
+    const storedData = localStorage.getItem('referenceData');
+    if (storedData) {
+      const parsedData: ReferenceItem[] = JSON.parse(storedData);
+      setReferenceData(parsedData);
+      const options = Array.from(new Set(parsedData.map(item => item.webPage))).sort();
+      setWebsiteOptions(options);
+    } else {
+      const getData = async () => {
+        const data = await getAllReferenceData();
+        setReferenceData(data);
+        localStorage.setItem('referenceData', JSON.stringify(data));
+
+        const options = Array.from(new Set(data.map(item => item.webPage))).sort();
+        setWebsiteOptions(options);
+        localStorage.setItem('websiteOptions', JSON.stringify(options));
+      };
+      getData();
+    }
   }, []);
 
   useEffect(() => {
@@ -41,14 +55,13 @@ const AdminPage: React.FC = () => {
 
   const checkPassword = () => {
     if (referenceData.length === 0) {
-      console.warn("Reference data not loaded yet.");
       setError("System not ready. Try again shortly.");
       return;
     }
-    const refItem = referenceData.find( item => item.refKey === "SD035");
+
+    const refItem = referenceData.find(item => item.refKey === "SD035");
     const VALID_TOKEN = refItem?.value ?? "";
-    console.log("Token = ", VALID_TOKEN);
-    const VALID_PASSWORD = 'kathy'; // TODO: Replace with your real backend check
+
     if (password === VALID_TOKEN) {
       setIsAuthenticated(true);
       setError('');
@@ -56,9 +69,22 @@ const AdminPage: React.FC = () => {
       setError('Incorrect password');
     }
   };
-  
-  console.log("Ref Data Array");
-  console.log(referenceData);
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPassword('');
+    setError('');
+  };
+
+  const handleClearStorage = () => {
+    localStorage.removeItem('referenceData');
+    localStorage.removeItem('websiteOptions');
+    setReferenceData([]);
+    setWebsiteOptions([]);
+    setIsAuthenticated(false);
+    setPassword('');
+    setError('');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -66,6 +92,7 @@ const AdminPage: React.FC = () => {
         title="AdminPage – Maidenhead Town Bowls Club"
         description="Provides access to the Administration features"
       />
+
       {!isAuthenticated ? (
         <div className="bg-gray-200 p-6 rounded-xl shadow-md w-full max-w-md">
           <h2 className="text-xl font-semibold mb-4">Admin Login</h2>
@@ -91,28 +118,44 @@ const AdminPage: React.FC = () => {
               className="w-full p-2 border rounded"
             />
           </div>
+
           <button
             onClick={checkPassword}
             disabled={referenceData.length === 0}
             className={`px-4 py-2 rounded text-white ${
-              referenceData.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              referenceData.length === 0
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
             Login
           </button>
         </div>
       ) : (
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-6">Welcome, {name}!</h2>
-          <div className="space-y-4">
-            <Link
-              to="/maintainData"
-              state={{ adminName: name }}
-              className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Maintain Data
-            </Link>
-          </div>
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-bold">Welcome, {name}!</h2>
+
+          <Link
+            to="/maintainData"
+            state={{ adminName: name }}
+            className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Maintain Data
+          </Link>
+
+          <button
+            onClick={handleLogout}
+            className="block bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            Logout
+          </button>
+
+          <button
+            onClick={handleClearStorage}
+            className="block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Clear Stored Data
+          </button>
         </div>
       )}
     </div>

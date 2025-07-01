@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { updateReferenceData } from 'utilities';
 
 import SEO from '../components/SEO';
-import { getReferenceData } from "../utilities/getReferenceData.js";
 
 interface ReferenceDataItem {
   webPage: string;
@@ -18,59 +18,47 @@ interface LocationState {
 const MaintainDataPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Type location.state as possibly undefined or with adminName string
   const state = location.state as LocationState | null;
   const adminName = state?.adminName;
+
+  const [data, setData] = useState<ReferenceDataItem[]>([]);
+  const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
+  const [selectedPage, setSelectedPage] = useState<string>('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editedValue, setEditedValue] = useState<string>('');
+  const [showToast, setShowToast] = useState<boolean>(false);
 
   // Redirect unauthorized users
   useEffect(() => {
     if (!adminName) {
       navigate('/admin', {
-        state: { error: 'Access denied. Please log in.' }
+        state: { error: 'Access denied. Please log in.' },
       });
     }
   }, [adminName, navigate]);
 
-  if (!adminName) return null;
-
-  const webPages = ['Home', 'AboutUs', 'ContactUs'];
-
-  const [data, setData] = useState<ReferenceDataItem[]>([
-    { webPage: 'Home', refKey: '1', name: 'WelcomeText1', value: 'Welcome to our site!' },
-    { webPage: 'Home', refKey: '2', name: 'BannerTitle2', value: 'Spring Open Day' },
-    { webPage: 'Home', refKey: '3', name: 'WelcomeText3', value: 'Welcome to our site!' },
-    { webPage: 'Home', refKey: '4', name: 'BannerTitle4', value: 'Spring Open Day' },
-    { webPage: 'Home', refKey: '5', name: 'WelcomeText5', value: 'Welcome to our site!' },
-    { webPage: 'Home', refKey: '6', name: 'BannerTitle6', value: 'Spring Open Day' },
-    { webPage: 'Home', refKey: '7', name: 'WelcomeText7', value: 'Welcome to our site!' },
-    { webPage: 'Home', refKey: '8', name: 'BannerTitle8', value: 'Spring Open Day' },
-    { webPage: 'AboutUs', refKey: '9', name: 'ClubHistory', value: 'Founded in 1901.' },
-    { webPage: 'ContactUs', refKey: '10', name: 'Email', value: 'info@club.org' },
-  ]);
-
-  const [selectedPage, setSelectedPage] = useState<string>(webPages[0]);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editedValue, setEditedValue] = useState<string>('');
-  const [showToast, setShowToast] = useState<boolean>(false);
-
-  // Fetch updated data from backend, if desired
+  // Load data from localStorage
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedData = await getReferenceData();
-        if (fetchedData && Array.isArray(fetchedData)) {
-          setData(fetchedData);
-        }
-      } catch (err) {
-        console.error('Error fetching reference data:', err);
-      }
-    };
-    fetchData();
+    const storedData = localStorage.getItem('referenceData');
+    const storedOptions = localStorage.getItem('websiteOptions');
+
+    if (storedData) {
+      const parsedData: ReferenceDataItem[] = JSON.parse(storedData);
+      setData(parsedData);
+    }
+
+    if (storedOptions) {
+      const parsedOptions: string[] = JSON.parse(storedOptions);
+      setWebsiteOptions(parsedOptions);
+      setSelectedPage(parsedOptions[0] || '');
+    }
   }, []);
 
-  // Filter data for the selected page, limit to 10 items max
-  const filteredData = data.filter(item => item.webPage === selectedPage).slice(0, 10);
+  if (!adminName) return null;
+
+  const filteredData = data
+    .filter((item) => item.webPage === selectedPage)
+    .slice(0, 10);
 
   const startEditing = (index: number) => {
     setEditingIndex(index);
@@ -83,8 +71,10 @@ const MaintainDataPage: React.FC = () => {
       return;
     }
 
-    setData(prev =>
-      prev.map(item => (item.refKey === refKey ? { ...item, value: editedValue } : item))
+    setData((prev) =>
+      prev.map((item) =>
+        item.refKey === refKey ? { ...item, value: editedValue } : item
+      )
     );
     setEditingIndex(null);
     setEditedValue('');
@@ -97,19 +87,27 @@ const MaintainDataPage: React.FC = () => {
 
   const deleteRow = (refKey: string) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      setData(prev => prev.filter(item => item.refKey !== refKey));
-      if (editingIndex !== null && filteredData[editingIndex]?.refKey === refKey) {
+      setData((prev) => prev.filter((item) => item.refKey !== refKey));
+      if (
+        editingIndex !== null &&
+        filteredData[editingIndex]?.refKey === refKey
+      ) {
         cancelEditing();
       }
     }
   };
 
-  const saveAllChanges = () => {
-    // Replace this with your API call to save data
-    console.log('Saving to backend:', data);
+const saveAllChanges = async () => {
+  try {
+    await updateReferenceData(data);              // Update backend
+    localStorage.setItem('referenceData', JSON.stringify(data)); // Persist locally
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
-  };
+  } catch (error) {
+    console.error('Error saving changes:', error);
+    alert('Failed to save changes. Please try again.');
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -128,12 +126,12 @@ const MaintainDataPage: React.FC = () => {
           <select
             className="w-full p-2 border rounded"
             value={selectedPage}
-            onChange={e => {
+            onChange={(e) => {
               setSelectedPage(e.target.value);
               cancelEditing();
             }}
           >
-            {webPages.map(page => (
+            {websiteOptions.map((page) => (
               <option key={page} value={page}>
                 {page}
               </option>
@@ -156,7 +154,7 @@ const MaintainDataPage: React.FC = () => {
                     <input
                       type="text"
                       value={editedValue}
-                      onChange={e => setEditedValue(e.target.value)}
+                      onChange={(e) => setEditedValue(e.target.value)}
                       className="w-2/3 p-1 border rounded"
                       autoFocus
                     />
@@ -208,10 +206,21 @@ const MaintainDataPage: React.FC = () => {
         <div className="mt-8 text-center">
           <button
             onClick={saveAllChanges}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            disabled={editingIndex !== null}
+            className={`px-6 py-2 rounded text-white transition ${
+              editingIndex !== null
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
             Save All Changes
           </button>
+          
+          {editingIndex !== null && (
+            <p className="text-sm text-red-600 mt-2">
+              Finish editing a row before saving all changes.
+            </p>
+          )}
         </div>
 
         {showToast && (

@@ -52,6 +52,44 @@ export const createReference = async (req, res) => {
     }
 };
 
+export const updateReferences = async (req, res) => {
+    const updatedRecords = req.body;
+
+    if (!Array.isArray(updatedRecords)) {
+        return res
+            .status(400)
+            .json({
+                error: "Request body must be an array of reference records",
+            });
+    }
+
+    try {
+        // Use bulkWrite for efficient batch update
+        const bulkOps = updatedRecords.map((record) => ({
+            updateOne: {
+                filter: { refKey: record.refKey },
+                update: {
+                    $set: {
+                        webPage: record.webPage,
+                        name: record.name,
+                        value: record.value,
+                    },
+                },
+                upsert: false, // do not create new if missing
+            },
+        }));
+
+        if (bulkOps.length > 0) {
+            await Reference.bulkWrite(bulkOps);
+        }
+
+        res.status(200).json({ message: "References updated successfully" });
+    } catch (error) {
+        console.error("Error updating references:", error);
+        res.status(500).json({ error: "Failed to update references" });
+    }
+};
+
 export const deleteReference = async (req, res) => {
     console.log("reference.controller, deleteReference");
 

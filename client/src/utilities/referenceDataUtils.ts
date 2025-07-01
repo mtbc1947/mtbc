@@ -52,3 +52,24 @@ export const getReferenceValuesByPage = async (
         throw new Error(`getReferenceValuesByPage error: ${err}`);
     }
 };
+
+export const updateReferenceData = async (
+    updatedRecords: ReferenceRecord[]
+): Promise<void> => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/reference/updateMany`;
+
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedRecords),
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Failed to update reference data: ${errorText}`);
+        }
+    } catch (err) {
+        throw new Error(`updateReferenceData error: ${err}`);
+    }
+};

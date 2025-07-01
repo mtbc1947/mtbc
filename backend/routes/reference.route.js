@@ -6,6 +6,7 @@ import {
 import {
     getReference,
     getPageReferences,
+    updateReferences,
     createReference,
 } from "../controllers/reference.controller.js";
 
@@ -16,6 +17,7 @@ console.log("reference Route");
 router.get("/", getReferences);
 router.get("/webPage/:webPage", getPageReferences);
 router.get("/refKey/:refKey/", getReference);
+router.post("/updateMany", updateReferences);
 
 router.post("/", createReference);
 router.delete("/:id", deleteReference);
