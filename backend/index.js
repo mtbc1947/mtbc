@@ -10,6 +10,7 @@ import mailjet from "node-mailjet";
 import connectDB from "./lib/connectDB.js";
 
 import referenceRouter from "./routes/reference.route.js";
+import eventRouter from "./routes/event.route.js";
 
 import imagesRouter from "./routes/images.js";
 
@@ -59,6 +60,8 @@ app.use((req, res, next) => {
 });
 
 app.use("/reference", referenceRouter);
+
+app.use("/event", eventRouter);
 
 app.use("/api/images", imagesRouter);
 

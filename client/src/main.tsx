@@ -12,6 +12,7 @@ import { HomePage } from 'pages';
 import { OpenDayPage } from 'pages';
 import { AboutUsPage } from 'pages';
 import { HistoryPage } from 'pages';
+import { FixturesPage } from 'pages';
 import { OfficersPage } from 'pages';
 import { TeamPage } from 'pages';
 import { NoticeBoardPage } from 'pages';
@@ -25,6 +26,7 @@ import { CountyPresidentsPage } from 'pages';
 import { PresidentsPage } from 'pages';
 import { AdminPage } from 'pages';
 import { MaintainDataPage } from 'pages';
+import { MaintainEventPage } from 'pages';
 
 
 const router = createBrowserRouter([
@@ -43,11 +45,13 @@ const router = createBrowserRouter([
       { path: "/location", element: <LocationPage />, errorElement: <RouteError /> },
       { path: "/contactUs", element: <ContactUsPage />, errorElement: <RouteError /> },
       { path: "/privacy", element: <PrivacyPage />, errorElement: <RouteError /> },
+      { path: "/fixtures", element: <FixturesPage />, errorElement: <RouteError /> },
       { path: "/booking", element: <BookingPage />, errorElement: <RouteError /> },
       { path: "/countyPresidents", element: <CountyPresidentsPage />, errorElement: <RouteError /> },
       { path: "/presidents", element: <PresidentsPage />, errorElement: <RouteError /> },
       { path: "/admin", element: <AdminPage />, errorElement: <RouteError /> },
       { path: "/maintainData", element: <MaintainDataPage />, errorElement: <RouteError /> },
+      { path: "/maintainEvent", element: <MaintainEventPage />, errorElement: <RouteError /> },
     ],
   },
 ]);

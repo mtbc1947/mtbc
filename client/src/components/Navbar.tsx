@@ -101,6 +101,7 @@ const Navbar: React.FC = () => {
             ))}
 
             {/* Non-dropdown links */}
+            <Link to="/fixtures" className="hover:text-indigo-600">Fixtures</Link>
             <Link to="/booking" className="hover:text-indigo-600">Booking</Link>
             <Link to="/location" className="hover:text-indigo-600">Location</Link>
             <Link to="/contactUs" className="hover:text-indigo-600">Contact</Link>
@@ -145,6 +146,7 @@ const Navbar: React.FC = () => {
             </div>
           ))}
 
+          <Link to="/fixtures" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Fixtures</Link>
           <Link to="/booking" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Booking</Link>
           <Link to="/location" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Location</Link>
           <Link to="/contactUs" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Contact</Link>

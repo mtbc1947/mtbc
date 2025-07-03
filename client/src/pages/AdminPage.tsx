@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SEO } from 'components';
-import { getAllReferenceData } from 'utilities';
+import { getAllReferenceData, ReferenceRecord } from 'utilities';
 
 interface LocationState {
   error?: string;
+  skipAuth?: boolean;
+  adminName?: string;
 }
-
-type ReferenceItem = {
-  refKey: string;
-  webPage: string;
-  name: string;
-  value: string;
-};
 
 const AdminPage: React.FC = () => {
   const location = useLocation();
@@ -22,14 +17,14 @@ const AdminPage: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [referenceData, setReferenceData] = useState<ReferenceItem[]>([]);
+  const [referenceData, setReferenceData] = useState<ReferenceRecord[]>([]);
   const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
 
-  // Load reference data from localStorage or backend
+  // Load reference data
   useEffect(() => {
     const storedData = localStorage.getItem('referenceData');
     if (storedData) {
-      const parsedData: ReferenceItem[] = JSON.parse(storedData);
+      const parsedData: ReferenceRecord[] = JSON.parse(storedData);
       setReferenceData(parsedData);
       const options = Array.from(new Set(parsedData.map(item => item.webPage))).sort();
       setWebsiteOptions(options);
@@ -38,7 +33,6 @@ const AdminPage: React.FC = () => {
         const data = await getAllReferenceData();
         setReferenceData(data);
         localStorage.setItem('referenceData', JSON.stringify(data));
-
         const options = Array.from(new Set(data.map(item => item.webPage))).sort();
         setWebsiteOptions(options);
         localStorage.setItem('websiteOptions', JSON.stringify(options));
@@ -47,11 +41,24 @@ const AdminPage: React.FC = () => {
     }
   }, []);
 
+  // Handle errors
   useEffect(() => {
     if (state?.error) {
       setError(state.error);
     }
   }, [state]);
+
+  // Skip auth if flag is set
+  useEffect(() => {
+    if (state?.skipAuth && referenceData.length > 0) {
+      const refItem = referenceData.find(item => item.refKey === "SD035");
+      if (refItem) {
+        setIsAuthenticated(true);
+        setName(state.adminName || "Admin");
+        setError('');
+      }
+    }
+  }, [state, referenceData]);
 
   const checkPassword = () => {
     if (referenceData.length === 0) {
@@ -141,6 +148,14 @@ const AdminPage: React.FC = () => {
             className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
             Maintain Data
+          </Link>
+
+          <Link
+            to="/maintainEvent"
+            state={{ adminName: name }}
+            className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Maintain Event
           </Link>
 
           <button

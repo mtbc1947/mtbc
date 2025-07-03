@@ -1,12 +1,14 @@
 export { default as AboutUsPage } from "./AboutUsPage";
 export { default as AdminPage } from "./AdminPage";
 export { default as BookingPage } from "./BookingPage";
+export { default as FixturesPage } from "./FixturesPage";
 export { default as ContactUsPage } from "./ContactUsPage";
 export { default as CountyPresidentsPage } from "./CountyPresidentsPage";
 export { default as HistoryPage } from "./HistoryPage";
 export { default as HomePage } from "./HomePage";
 export { default as LocationPage } from "./LocationPage";
 export { default as MaintainDataPage } from "./MaintainDataPage";
+export { default as MaintainEventPage } from "./MaintainEventPage";
 export { default as NewsReportsPage } from "./NewsReportsPage";
 export { default as NoticeBoardPage } from "./NoticeBoardPage";
 export { default as OfficersPage } from "./OfficersPage";
