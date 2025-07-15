@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SEO } from 'components';
 import { getAllReferenceData, ReferenceRecord } from 'utilities';
+import { useAuth } from '../auth/AuthContext';
 
 interface LocationState {
   error?: string;
@@ -13,14 +14,15 @@ const AdminPage: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState | undefined;
 
-  const [name, setName] = useState<string>('');
+  const { isAuthenticated, adminName, login, logout, skipAuth } = useAuth();
+
+  const [name, setName] = useState<string>(state?.adminName || '');
   const [password, setPassword] = useState<string>('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [referenceData, setReferenceData] = useState<ReferenceRecord[]>([]);
   const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
 
-  // Load reference data
+  // Load reference data from localStorage or API
   useEffect(() => {
     const storedData = localStorage.getItem('referenceData');
     if (storedData) {
@@ -41,54 +43,58 @@ const AdminPage: React.FC = () => {
     }
   }, []);
 
-  // Handle errors
+  // Show error from navigation state, if any
   useEffect(() => {
     if (state?.error) {
       setError(state.error);
     }
   }, [state]);
 
-  // Skip auth if flag is set
+  // Handle skipAuth ONLY on internal navigation (NOT on refresh)
   useEffect(() => {
-    if (state?.skipAuth && referenceData.length > 0) {
-      const refItem = referenceData.find(item => item.refKey === "SD035");
-      if (refItem) {
-        setIsAuthenticated(true);
-        setName(state.adminName || "Admin");
-        setError('');
-      }
+    if (state?.skipAuth) {
+      skipAuth(state.adminName || 'Admin');
+      setError('');
     }
-  }, [state, referenceData]);
+    // We deliberately do NOT depend on referenceData here to avoid repeated calls
+  }, [state, skipAuth]);
 
+  // Clear error on successful authentication
+  useEffect(() => {
+    if (isAuthenticated) {
+      setError('');
+    }
+  }, [isAuthenticated]);
+
+  // Check password against the reference data value
   const checkPassword = () => {
     if (referenceData.length === 0) {
-      setError("System not ready. Try again shortly.");
+      setError('System not ready. Try again shortly.');
       return;
     }
 
-    const refItem = referenceData.find(item => item.refKey === "SD035");
-    const VALID_TOKEN = refItem?.value ?? "";
+    const refItem = referenceData.find(item => item.refKey === 'SD035');
+    const VALID_TOKEN = refItem?.value ?? '';
 
     if (password === VALID_TOKEN) {
-      setIsAuthenticated(true);
-      setError('');
+      const success = login(name || 'Admin', password);
+      if (success) {
+        setError('');
+      } else {
+        setError('Login failed');
+      }
     } else {
       setError('Incorrect password');
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setPassword('');
-    setError('');
-  };
-
+  // Clear localStorage and logout
   const handleClearStorage = () => {
     localStorage.removeItem('referenceData');
     localStorage.removeItem('websiteOptions');
     setReferenceData([]);
     setWebsiteOptions([]);
-    setIsAuthenticated(false);
+    logout();
     setPassword('');
     setError('');
   };
@@ -140,11 +146,11 @@ const AdminPage: React.FC = () => {
         </div>
       ) : (
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">Welcome, {name}!</h2>
+          <h2 className="text-2xl font-bold">Welcome, {adminName || 'Admin'}!</h2>
 
           <Link
             to="/maintainData"
-            state={{ adminName: name }}
+            state={{ skipAuth: true, adminName }}
             className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
             Maintain Data
@@ -152,14 +158,14 @@ const AdminPage: React.FC = () => {
 
           <Link
             to="/maintainEvent"
-            state={{ adminName: name }}
+            state={{ skipAuth: true, adminName }}
             className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
             Maintain Event
           </Link>
 
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="block bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
           >
             Logout

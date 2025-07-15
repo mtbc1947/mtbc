@@ -20,7 +20,7 @@ const MaintainDataPage: React.FC = () => {
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
   const adminName = state?.adminName;
-
+// webSiteOptions is the web page filter dropdown options values
   const [data, setData] = useState<ReferenceDataItem[]>([]);
   const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>('');

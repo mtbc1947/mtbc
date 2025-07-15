@@ -1,5 +1,10 @@
 // utilities/eventDataUtils.ts
 
+export interface ValidationError {
+    row: number;
+    errors: string[];
+}
+
 export interface EventRecord {
     eventId: string;
     subject: string;
@@ -56,23 +61,79 @@ export const getAllEventData = async (): Promise<EventRecord[]> => {
     }
 };
 
-export const updateEventData = async (
-    updatedRecords: EventRecord[]
-): Promise<void> => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/event/updateMany`;
+export const createEvent = async (event: EventRecord): Promise<EventRecord> => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/event`;
+    console.log("util/createEvent");
+    console.log(event);
 
     try {
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedRecords),
+            body: JSON.stringify(event),
         });
 
         if (!res.ok) {
             const errorText = await res.text();
-            throw new Error(`Failed to update event data: ${errorText}`);
+            throw new Error(`Failed to create event: ${errorText}`);
         }
+
+        return await res.json();
     } catch (err) {
-        throw new Error(`updateEventData error: ${err}`);
+        throw new Error(`createEvent error: ${err}`);
     }
 };
+
+export const updateEvent = async (event: EventRecord): Promise<EventRecord> => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/event/${event.eventId}`;
+    console.log("util/updateEvent");
+    console.log(event);
+
+    try {
+        const res = await fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(event),
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Failed to update event: ${errorText}`);
+        }
+
+        return await res.json();
+    } catch (err) {
+        throw new Error(`updateEvent error: ${err}`);
+    }
+};
+
+export async function importEvents(file: File): Promise<{ inserted: number }> {
+    console.log("util/importEvents");
+
+    const url = `${import.meta.env.VITE_BACKEND_URL}/event/import`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    let response: Response;
+    let data: any;
+
+    try {
+        response = await fetch(url, {
+            method: "POST",
+            body: formData,
+        });
+        data = await response.json();
+    } catch (err) {
+        console.error("Network or JSON parsing error", err);
+        throw new Error("Failed to communicate with server");
+    }
+
+    if (!response.ok) {
+        const error = new Error(data?.message || "Import failed");
+        (error as any).validationErrors = data?.errors ?? [];
+        throw error;
+    }
+
+    return { inserted: data.inserted ?? 0 };
+}

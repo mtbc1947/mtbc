@@ -1,200 +1,229 @@
-import React, { useState } from "react";
-import { Pencil, Trash } from "lucide-react";
-import { useLocation, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { EventRecord } from '../utilities/eventDataUtils';
+import { MaintainEntityManager } from '../components/MaintainEntityManager';
+import MaintainPageLayout from '../layouts/MaintainPageLayout';
+import EditFormArea from '../components/EditFormArea';
+import { Commands } from '../components/Commands';
+import backgroundImage from '../assets/green1.jpg';
+import { getAllEventData } from 'utilities';
+import { createEvent, updateEvent, importEvents } from 'utilities'; // adjust path as needed
 
-type EventData = {
-  date: string;
-  league: string;
-  subject: string;
-  rinks: number;
-  venue: string;
-  start: string;
-  duration: number;
-};
-
-const eventListInitial: EventData[] = [
-  { date: "Sat, 3 May", league: "FGX", subject: "Henley v Town X", rinks: 4, venue: "Away", start: "14:30", duration: 3 },
-  { date: "Sun, 4 May", league: "FGX", subject: "Burghfield v Town X (Cancelled)", rinks: 5, venue: "Away", start: "14:30", duration: 3 },
-  { date: "Sun, 18 May", league: "FGX", subject: "Town X v Iver Heath", rinks: 5, venue: "Home", start: "14:00", duration: 3 },
-  { date: "Sat, 24 May", league: "FGX", subject: "Windsor & Eton v Town X", rinks: 5, venue: "Away", start: "14:30", duration: 3 },
-  { date: "Wed, 28 May", league: "FGX", subject: "Town X v Flackwell Heath", rinks: 4, venue: "Home", start: "18:00", duration: 3 },
-];
-
-interface LocationState {
-  adminName?: string;
-}
+import {
+  renderEventTableRow,
+  renderEventListRow,
+} from '../components/EventRenderers';
+import { useAuth } from '../auth/AuthContext';  // Adjust path if needed
+import ValidationErrorPanel from '../components/ValidationErrorPanel';
 
 const MaintainEventPage: React.FC = () => {
-  const location = useLocation();
-  const state = location.state as LocationState;
-  const adminName = state?.adminName || 'Admin';
+  const { isAuthenticated, adminName } = useAuth();
 
-  const [events, setEvents] = useState<EventData[]>(eventListInitial);
-  const [editingEvent, setEditingEvent] = useState<EventData | null>(null);
+  const [events, setEvents] = useState<EventRecord[]>([]);
+  const [selectedItems, setSelectedItems] = useState<EventRecord[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [itemBeingEdited, setItemBeingEdited] = useState<EventRecord | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const handleDelete = (index: number) => {
-    const confirmed = window.confirm("Are you sure you want to delete this event?");
-    if (confirmed) {
-      const updatedEvents = [...events];
-      updatedEvents.splice(index, 1);
-      setEvents(updatedEvents);
+  const [validationErrors, setValidationErrors] = useState<{ row: number | string; errors: string[] }[]>([]);
+  const [importSuccessMsg, setImportSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const data = await getAllEventData();
+        setEvents(data);
+      } catch (error) {
+        console.error(error);
+      }
     }
+    fetchEvents();
+  }, []);
+
+  const isSelected = (item: EventRecord) =>
+    selectedItems.some((i) => i.eventId === item.eventId);
+
+  const onSelectItem = (item: EventRecord) => {
+    setSelectedItems((prev) =>
+      prev.some((i) => i.eventId === item.eventId)
+        ? prev.filter((i) => i.eventId !== item.eventId)
+        : [...prev, item]
+    );
   };
 
+  const newEvent: EventRecord = {
+    eventId: ``,
+    subject: 'New Event',
+    status: 'A',
+    reqYear: 2025,
+    reqMonth: 7,
+    reqDate: 1,
+    reqJDate: 0,
+    startTime: '10:00',
+    severity: 'G`',
+    homeAway: 'H`',
+    dress: 'None',
+    mix: 'X`',
+    duration: 3,
+    rinks: 1,
+    eventType: 'CG`',
+    useType: 'L`',
+    gameType: 'F',
+    league: 'KL',
+    division: 'A',
+    team: 'A',
+    calKey: `MTBC`,
+  };
+
+  const handleCreate = () => {
+    if (!isAuthenticated) return;
+    setItemBeingEdited(newEvent);
+    setSelectedItems([]); // Optional: clear selection
+    setEditMode(true);
+  };
+
+  const handleEditSelected = () => {
+    if (!isAuthenticated || selectedItems.length !== 1) return;
+    setItemBeingEdited(selectedItems[0]);
+    setEditMode(true);
+  };
+
+  const handleDeleteSelected = () => {
+    if (!isAuthenticated || selectedItems.length === 0) return;
+    setEvents((prev) => prev.filter((e) => !selectedItems.some((sel) => sel.eventId === e.eventId)));
+    setSelectedItems([]);
+  };
+
+  const handleSave = async () => {
+    if (!itemBeingEdited) return;
+    try {
+      let savedItem: EventRecord;
+
+      if (!itemBeingEdited.eventId || itemBeingEdited.eventId.trim() === "") {
+        savedItem = await createEvent(itemBeingEdited);
+      } else {
+        savedItem = await updateEvent(itemBeingEdited);
+      }
+
+      setEvents((prev) =>
+        prev.some((e) => e.eventId === savedItem.eventId)
+          ? prev.map((e) => (e.eventId === savedItem.eventId ? savedItem : e))
+          : [...prev, savedItem]
+      );
+
+      setEditMode(false);
+      setItemBeingEdited(null);
+      setSelectedItems([]);
+    } catch (error) {
+      console.error("Save error:", error);
+    }
+  };
+ 
+  const handleCancel = () => {
+    setEditMode(false);
+    setItemBeingEdited(null);
+    setSelectedItems([]);
+  };
+  
+
+const handleUpload = async (file: File) => {
+  try {
+    setValidationErrors([]);
+    setImportSuccessMsg(null);
+
+    const result = await importEvents(file);
+    setImportSuccessMsg(`CSV imported successfully. Inserted ${result.inserted} records.`);
+
+    // Optionally refresh event list after import
+    const data = await getAllEventData();
+    setEvents(data);
+  } catch (err: any) {
+    console.error("Upload failed", err);
+
+    if (err.validationErrors) {
+      setValidationErrors(err.validationErrors);
+    } else {
+      setValidationErrors([
+        { row: "N/A", errors: [err.message || "Unexpected error occurred."] },
+      ]);
+    }
+
+    setImportSuccessMsg(null); // Clear any previous success
+  }
+};
+
+  if (!isAuthenticated) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-xl font-bold text-red-600">Access Denied</h2>
+        <p>Please log in to access this page.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#c2c067] p-6 font-sans text-black">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Maintain Event</h1>
-        <p className="mb-6">Logged in as <span className="font-semibold">{adminName}</span></p>
-
-        <p className="mb-6 text-lg">
-          An event is an entry that is published in the club's fixture list. You can filter the list by
-          selecting an Event Type. You can then create a new event, or by selecting those shown, either update
-          an event or delete a number of them.
-        </p>
-
+    <MaintainPageLayout
+      backgroundImage={backgroundImage as string}
+      editMode={editMode}
+      filter={
         <div className="mb-6">
-          <label className="font-bold mr-4 text-lg">Event Type</label>
           <input
             type="text"
-            className="border px-3 py-1"
-            defaultValue="Maidenhead Town FGX"
+            placeholder="Filter events (not implemented)"
+            className="w-full p-2 border rounded"
+            disabled
           />
         </div>
-
-        <div className="flex justify-between items-start">
-          {/* Event Table */}
-          {!editingEvent && (
-            <div className="w-3/4">
-              <div className="flex items-center mb-2 text-sm">
-                <span className="mr-2">0</span>
-                <span>/</span>
-                <span className="mx-2">21</span>
-                <input type="text" className="border w-12 text-center mx-2" defaultValue="5" />
-              </div>
-
-              <table className="w-full border border-collapse text-sm">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="border px-2 py-1">Start Date</th>
-                    <th className="border px-2 py-1 text-center">League</th>
-                    <th className="border px-2 py-1">Subject</th>
-                    <th className="border px-2 py-1 text-center">Rinks</th>
-                    <th className="border px-2 py-1 text-center">Venue</th>
-                    <th className="border px-2 py-1 text-center">Start</th>
-                    <th className="border px-2 py-1 text-center">Duration</th>
-                    <th className="border px-2 py-1 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {events.map((event, idx) => (
-                    <tr key={idx} className="bg-white hover:bg-gray-100">
-                      <td className="border px-2 py-1">{event.date}</td>
-                      <td className="border px-2 py-1 text-center">{event.league}</td>
-                      <td className="border px-2 py-1">
-                        <span className={event.subject.includes("Cancelled") ? "line-through" : ""}>
-                          {event.subject}
-                        </span>
-                      </td>
-                      <td className="border px-2 py-1 text-center">{event.rinks}</td>
-                      <td className="border px-2 py-1 text-center">{event.venue}</td>
-                      <td className="border px-2 py-1 text-center">{event.start}</td>
-                      <td className="border px-2 py-1 text-center">{event.duration}</td>
-                      <td className="border px-2 py-1 text-center flex justify-center gap-2">
-                        <button onClick={() => setEditingEvent(event)} title="Edit">
-                          <Pencil className="w-4 h-4 text-blue-600 hover:text-blue-800" />
-                        </button>
-                        <button onClick={() => handleDelete(idx)} title="Delete">
-                          <Trash className="w-4 h-4 text-red-600 hover:text-red-800" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Pagination */}
-              <div className="flex justify-center mt-4 text-xl gap-4">
-                <button>{'<<'}</button>
-                <button>{'<'}</button>
-                <span className="px-3 py-1 border rounded bg-white">1</span>
-                <button>{'>'}</button>
-                <button>{'>>'}</button>
-              </div>
-            </div>
-          )}
-
-          {/* Edit Panel */}
-          {editingEvent && (
-            <div className="w-3/4 bg-white border rounded p-6">
-              <h2 className="text-xl font-semibold mb-4">Edit Event</h2>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <label className="block font-semibold">Start Date</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.date} />
-                </div>
-                <div>
-                  <label className="block font-semibold">League</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.league} />
-                </div>
-                <div className="col-span-2">
-                  <label className="block font-semibold">Subject</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.subject} />
-                </div>
-                <div>
-                  <label className="block font-semibold">Rinks</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.rinks} />
-                </div>
-                <div>
-                  <label className="block font-semibold">Venue</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.venue} />
-                </div>
-                <div>
-                  <label className="block font-semibold">Start Time</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.start} />
-                </div>
-                <div>
-                  <label className="block font-semibold">Duration</label>
-                  <input className="w-full border px-2 py-1" defaultValue={editingEvent.duration} />
-                </div>
-              </div>
-              <div className="mt-6 flex gap-4">
-                <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded"
-                  onClick={() => alert("Save functionality to be implemented")}
-                >
-                  Save
-                </button>
-                <button
-                  className="bg-gray-400 text-white px-4 py-2 rounded"
-                  onClick={() => setEditingEvent(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Side Panel */}
-          <div className="w-1/4 pl-6">
-            <div className="border rounded-lg p-4">
-              <h2 className="text-lg font-semibold mb-4">Live Event Maintenance</h2>
-              <button className="bg-teal-200 rounded-full px-5 py-2 mb-6 hover:bg-teal-300">
-                Create
-              </button>
-              <div className="mb-2">Go to:</div>
-              <Link
-                to="/admin"
-                state={{ skipAuth: true, adminName }}
-                className="bg-teal-200 rounded-full px-5 py-2 hover:bg-teal-300 block text-center"
-              >
-                Menu
-              </Link>
-            </div>
+      }
+      commands={
+        <Commands
+          editMode={editMode}
+          canCreate={isAuthenticated}
+          canEdit={selectedItems.length === 1 && isAuthenticated}
+          canDelete={selectedItems.length > 0 && isAuthenticated}
+          onCreate={handleCreate}
+          onEdit={handleEditSelected}
+          onDelete={handleDeleteSelected}
+          onSave={handleSave}
+          onCancel={handleCancel}
+          onUpload={handleUpload}
+        />
+      }
+      listPanel={
+        <>
+        {validationErrors.length > 0 && <ValidationErrorPanel errors={validationErrors} />}
+        {importSuccessMsg && (
+          <div className="mb-4 max-w-7xl mx-auto border border-green-300 bg-green-50 p-4 rounded text-green-700 font-medium">
+            {importSuccessMsg}
           </div>
-        </div>
-      </div>
-    </div>
+        )}
+        <MaintainEntityManager<EventRecord>
+          entities={events}
+          selectedItems={selectedItems}
+          onSelectItem={onSelectItem}
+          onSelectAll={(checked) => setSelectedItems(checked ? [...events] : [])}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          renderItem={(item, index) =>
+            renderEventTableRow(item, index, isSelected, onSelectItem)
+          }
+          renderMobileItem={(item, index) =>
+            renderEventListRow(item, index, isSelected, onSelectItem)
+          }
+        />
+        </>
+      }
+      editPanel={
+        editMode && itemBeingEdited ? (
+          <EditFormArea
+            item={itemBeingEdited}
+            setItem={setItemBeingEdited}
+          />
+        ) : null
+      }
+    />
   );
 };
 

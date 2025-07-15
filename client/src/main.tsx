@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AuthProvider } from './auth/AuthContext';
+
 
 import { MainLayout } from 'layouts';
 import { ErrorBoundary } from 'components';
@@ -65,9 +69,12 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <HelmetProvider>
-      <ErrorBoundary>
-        <RouterProvider router={router} />
-      </ErrorBoundary>
+      <AuthProvider>
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+          <ToastContainer />
+        </ErrorBoundary>
+      </AuthProvider>
     </HelmetProvider>
   </StrictMode>,
 );

@@ -5,7 +5,6 @@ dotenv.config({ path: envFile });
 
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import mailjet from "node-mailjet";
 import connectDB from "./lib/connectDB.js";
 
@@ -27,7 +26,7 @@ const mailjetClient = mailjet.apiConnect(
         options: {},
     }
 );
-app.use(bodyParser.json());
+app.use(express.json());
 
 const allowedOrigins =
     process.env.NODE_ENV === "production"
@@ -48,14 +47,16 @@ app.use(
                 );
             }
         },
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "PUT"],
         allowedHeaders: ["Content-Type"],
         credentials: true, // Optional: enable if using cookies/sessions
     })
 );
 
 app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
+    console.log(`Incoming request: ${req.method} ${req.url} and body:`);
+    console.log(req.body);
+    ``;
     next();
 });
 
@@ -103,6 +104,8 @@ app.post("/send-email", async (req, res) => {
         res.status(500).json({ message: "Failed to send email." });
     }
 });
+
+app.get("/health", (req, res) => res.send("OK"));
 
 app.get("/test", async (req, res) => {
     console.log("Got /test");
