@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getAllReferenceData, ReferenceRecord } from 'utilities';
+import { getAllRefData, refDataRecord } from 'utilities';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -14,22 +14,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminName, setAdminName] = useState('');
-  const [referenceData, setReferenceData] = useState<ReferenceRecord[]>([]);
+  const [refData, setRefData] = useState<refDataRecord[]>([]);
 
-  // Load referenceData and auth state on mount
+  // Load refData and auth state on mount
   useEffect(() => {
-    const loadReferenceData = async () => {
-      const stored = localStorage.getItem('referenceData');
+    const loadRefData = async () => {
+      const stored = localStorage.getItem('refData');
       if (stored) {
-        setReferenceData(JSON.parse(stored));
+        setRefData(JSON.parse(stored));
       } else {
-        const data = await getAllReferenceData();
-        localStorage.setItem('referenceData', JSON.stringify(data));
-        setReferenceData(data);
+        const data = await getAllRefData();
+        localStorage.setItem('refData', JSON.stringify(data));
+        setRefData(data);
       }
     };
 
-    loadReferenceData();
+    loadRefData();
 
     // Load auth state
     const storedAuth = localStorage.getItem('auth');
@@ -41,10 +41,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = (name: string, password: string): boolean => {
-    // Make sure referenceData is loaded before checking
-    if (referenceData.length === 0) return false;
+    // Make sure refData is loaded before checking
+    if (refData.length === 0) return false;
 
-    const refItem = referenceData.find((item) => item.refKey === 'SD035');
+    const refItem = refData.find((item) => item.refKey === 'SD035');
     const valid = refItem?.value === password;
     if (valid) {
       setAdminName(name);

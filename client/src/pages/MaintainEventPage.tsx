@@ -1,38 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { EventRecord } from '../utilities/eventDataUtils';
-import { MaintainEntityManager } from '../components/MaintainEntityManager';
+import SEO from "../components/SEO";
 import MaintainPageLayout from '../layouts/MaintainPageLayout';
-import EditFormArea from '../components/EditFormArea';
+import { MaintainEntityManager } from '../components/MaintainEntityManager';
 import { Commands } from '../components/Commands';
 import backgroundImage from '../assets/green1.jpg';
-import { getAllEventData } from 'utilities';
-import { createEvent, updateEvent, importEvents } from 'utilities'; // adjust path as needed
+import { useAuth } from '../auth/AuthContext';
 
-import {
-  renderEventTableRow,
-  renderEventListRow,
-} from '../components/EventRenderers';
-import { useAuth } from '../auth/AuthContext';  // Adjust path if needed
+import { getAllEventData } from 'utilities';
+import { EventRecord } from '../utilities/eventUtils';
+import { getEventColumns } from '../components/Event/EventColumns';
+import EditFormArea from '../components/Event/EventEditFormArea';
+import { createEvent, updateEvent, importEvents } from 'utilities';
 import ValidationErrorPanel from '../components/ValidationErrorPanel';
 
 const MaintainEventPage: React.FC = () => {
   const { isAuthenticated, adminName } = useAuth();
 
   const [events, setEvents] = useState<EventRecord[]>([]);
+
   const [selectedItems, setSelectedItems] = useState<EventRecord[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [itemBeingEdited, setItemBeingEdited] = useState<EventRecord | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
+  
+  const [filterKey, setFilterKey] = useState('');
+  const [filterText, setFilterText] = useState('');
+  
   const [validationErrors, setValidationErrors] = useState<{ row: number | string; errors: string[] }[]>([]);
   const [importSuccessMsg, setImportSuccessMsg] = useState<string | null>(null);
-
+  
   useEffect(() => {
     async function fetchEvents() {
       try {
         const data = await getAllEventData();
         setEvents(data);
+        if (data) {
+          console.log(`Read ${data.length} events`);
+        } else {
+          console.log("No events found");
+        }
       } catch (error) {
         console.error(error);
       }
@@ -51,10 +58,42 @@ const MaintainEventPage: React.FC = () => {
     );
   };
 
+  const filterOptions = [
+    { key: '', label: 'All fields' },
+    { key: "FG", label: "Friendly Games" },
+    { key: "HG", label: "Loan" },
+    { key: "KL", label: "Kennet League" },
+    { key: "KV", label: "KLV League" },
+    { key: "MTBC", label: "Club Events" },
+    { key: "RSL", label: "Royal Shield" },
+    { key: "TVL", label: "Thames Valley" },
+  ];
+
+  const eventFilterFunction = (e: EventRecord, filterText?: string, filterKey?: string): boolean => {
+    const trimmed = filterText?.trim().toLowerCase() || '';
+
+    const matchesCalKey = filterKey ? e.calKey === filterKey : true;
+
+    if (trimmed === '') {
+      return matchesCalKey;
+    }
+
+    if (filterKey && trimmed) {
+      return matchesCalKey && Object.values(e).some(
+        (val) => typeof val === 'string' && val.toLowerCase().includes(trimmed)
+      );
+    }
+
+    return Object.values(e).some(
+      (val) => typeof val === 'string' && val.toLowerCase().includes(trimmed)
+    );
+  };
+
   const newEvent: EventRecord = {
     eventId: ``,
     subject: 'New Event',
     status: 'A',
+    startDate: "2025-July-01",
     reqYear: 2025,
     reqMonth: 7,
     reqDate: 1,
@@ -78,7 +117,7 @@ const MaintainEventPage: React.FC = () => {
   const handleCreate = () => {
     if (!isAuthenticated) return;
     setItemBeingEdited(newEvent);
-    setSelectedItems([]); // Optional: clear selection
+    setSelectedItems([]);
     setEditMode(true);
   };
 
@@ -118,39 +157,37 @@ const MaintainEventPage: React.FC = () => {
       console.error("Save error:", error);
     }
   };
- 
+
   const handleCancel = () => {
     setEditMode(false);
     setItemBeingEdited(null);
     setSelectedItems([]);
   };
-  
 
-const handleUpload = async (file: File) => {
-  try {
-    setValidationErrors([]);
-    setImportSuccessMsg(null);
+  const handleUpload = async (file: File) => {
+    try {
+      setValidationErrors([]);
+      setImportSuccessMsg(null);
 
-    const result = await importEvents(file);
-    setImportSuccessMsg(`CSV imported successfully. Inserted ${result.inserted} records.`);
+      const result = await importEvents(file);
+      setImportSuccessMsg(`CSV imported successfully. Inserted ${result.inserted} records.`);
 
-    // Optionally refresh event list after import
-    const data = await getAllEventData();
-    setEvents(data);
-  } catch (err: any) {
-    console.error("Upload failed", err);
+      const data = await getAllEventData();
+      setEvents(data);
+    } catch (err: any) {
+      console.error("Upload failed", err);
 
-    if (err.validationErrors) {
-      setValidationErrors(err.validationErrors);
-    } else {
-      setValidationErrors([
-        { row: "N/A", errors: [err.message || "Unexpected error occurred."] },
-      ]);
+      if (err.validationErrors) {
+        setValidationErrors(err.validationErrors);
+      } else {
+        setValidationErrors([
+          { row: "N/A", errors: [err.message || "Unexpected error occurred."] },
+        ]);
+      }
+
+      setImportSuccessMsg(null);
     }
-
-    setImportSuccessMsg(null); // Clear any previous success
-  }
-};
+  };
 
   if (!isAuthenticated) {
     return (
@@ -166,19 +203,32 @@ const handleUpload = async (file: File) => {
       backgroundImage={backgroundImage as string}
       editMode={editMode}
       filter={
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Filter events (not implemented)"
-            className="w-full p-2 border rounded"
-            disabled
-          />
+        <div className="mb-6 space-y-2">
+          <div className="flex gap-2">
+            <select
+              className="p-2 border rounded"
+              value={filterKey}
+              onChange={(e) => setFilterKey(e.target.value)}
+            >
+              {filterOptions.map((opt) => (
+                <option key={opt.key} value={opt.key}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Enter filter text"
+              className="flex-1 p-2 border rounded"
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+            />
+          </div>
         </div>
       }
       commands={
         <Commands
           editMode={editMode}
-          canCreate={isAuthenticated}
           canEdit={selectedItems.length === 1 && isAuthenticated}
           canDelete={selectedItems.length > 0 && isAuthenticated}
           onCreate={handleCreate}
@@ -191,36 +241,32 @@ const handleUpload = async (file: File) => {
       }
       listPanel={
         <>
-        {validationErrors.length > 0 && <ValidationErrorPanel errors={validationErrors} />}
-        {importSuccessMsg && (
-          <div className="mb-4 max-w-7xl mx-auto border border-green-300 bg-green-50 p-4 rounded text-green-700 font-medium">
-            {importSuccessMsg}
-          </div>
-        )}
-        <MaintainEntityManager<EventRecord>
-          entities={events}
-          selectedItems={selectedItems}
-          onSelectItem={onSelectItem}
-          onSelectAll={(checked) => setSelectedItems(checked ? [...events] : [])}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={setItemsPerPage}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          renderItem={(item, index) =>
-            renderEventTableRow(item, index, isSelected, onSelectItem)
-          }
-          renderMobileItem={(item, index) =>
-            renderEventListRow(item, index, isSelected, onSelectItem)
-          }
-        />
+          {validationErrors.length > 0 && <ValidationErrorPanel errors={validationErrors} />}
+          {importSuccessMsg && (
+            <div className="mb-4 max-w-7xl mx-auto border border-green-300 bg-green-50 p-4 rounded text-green-700 font-medium">
+              {importSuccessMsg}
+            </div>
+          )}
+          <MaintainEntityManager<EventRecord>
+            columns={getEventColumns()}
+            entities={events}
+            selectedItems={selectedItems}
+            onSelectItem={onSelectItem}
+            onSelectAll={(checked) => setSelectedItems(checked ? [...events] : [])}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            isSelected={isSelected}
+            filterText={filterText}
+            filterKey={filterKey}
+            filterFunction={eventFilterFunction}
+          />
         </>
       }
       editPanel={
         editMode && itemBeingEdited ? (
-          <EditFormArea
-            item={itemBeingEdited}
-            setItem={setItemBeingEdited}
-          />
+          <EditFormArea item={itemBeingEdited} setItem={setItemBeingEdited} />
         ) : null
       }
     />

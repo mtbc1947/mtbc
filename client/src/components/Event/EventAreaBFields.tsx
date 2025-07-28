@@ -1,6 +1,6 @@
 // AreaBFields.tsx
 import React from "react";
-import { EventRecord } from "../utilities/eventDataUtils";
+import { EventRecord } from "../../utilities/eventUtils";
 
 interface AreaBFieldsProps {
   editedEvent: EventRecord;

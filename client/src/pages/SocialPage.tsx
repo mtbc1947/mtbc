@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SEO from '../components/SEO';
-import { getReferenceValuesByPage } from '../utilities';
+import { getRefDataValuesByPage } from '../utilities';
 
 import clubFront from '../assets/club_front.jpg';
 import green1 from '../assets/green1.jpg';
@@ -11,10 +11,10 @@ const SocialPage: React.FC = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data: string[] = await getReferenceValuesByPage("Social");
+        const data: string[] = await getRefDataValuesByPage("Social");
         setStrings(data);
       } catch (error) {
-        console.error("Failed to fetch reference values:", error);
+        console.error("Failed to fetch refData values:", error);
       }
     };
     getData();

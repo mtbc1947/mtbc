@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { EventRecord } from "../utilities/eventDataUtils";
-import AreaAFields from "./AreaAFields";
-import AreaBFields from "./AreaBFields";
+import { EventRecord } from "../../utilities/eventUtils";
+import AreaAFields from "./EventAreaAFields";
+import AreaBFields from "./EventAreaBFields";
+import {
+  parseStartDate,
+  convertDateToJulian,
+} from "utilities/dateHelpers"
 
-interface EditFormAreaProps {
+interface EventEditFormAreaProps {
   item: EventRecord;
   setItem: (item: EventRecord) => void;
 }
 
-const EditFormArea: React.FC<EditFormAreaProps> = ({ item, setItem }) => {
+const EventEditFormArea: React.FC<EventEditFormAreaProps> = ({ item, setItem }) => {
   const [showAreaB, setShowAreaB] = useState<boolean>(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-
+    console.log("here", name, value);
     if (name === "date") {
       // Convert "YYYY-MM-DD" to reqYear, reqMonth, reqDate
       const [year, month, day] = value.split("-").map(Number);
       setItem({
         ...item,
+        startDate: value, 
         reqYear: year,
         reqMonth: month - 1, // 0-based month
         reqDate: day,
+        reqJDate: convertDateToJulian(day, month, year),
       });
     } else {
       setItem({
@@ -56,4 +62,4 @@ const EditFormArea: React.FC<EditFormAreaProps> = ({ item, setItem }) => {
   );
 };
 
-export default EditFormArea;
+export default EventEditFormArea;

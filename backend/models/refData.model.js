@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import mongoose from "mongoose";
 
-const referenceSchema = new Schema(
+const refDataSchema = new Schema(
     {
         refKey: {
             type: String,
@@ -22,4 +22,4 @@ const referenceSchema = new Schema(
     { timestamps: true }
 );
 
-export default mongoose.model("Reference", referenceSchema);
+export default mongoose.model("RefData", refDataSchema);

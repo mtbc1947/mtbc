@@ -1,4 +1,6 @@
-// utilities/eventDataUtils.ts
+// utilities/eventUtils.ts
+
+import { formatEventDate } from "./formatUtils";
 
 export interface ValidationError {
     row: number;
@@ -9,6 +11,7 @@ export interface EventRecord {
     eventId: string;
     subject: string;
     status: string;
+    startDate: string;
     reqYear: number;
     reqMonth: number;
     reqDate: number;
@@ -27,6 +30,14 @@ export interface EventRecord {
     division: string;
     team: string;
     calKey: string;
+}
+
+function pad(n: number): string {
+    return n.toString().padStart(2, "0");
+}
+
+function buildStartDate(year: number, month: number, day: number): string {
+    return `${year}-${pad(month + 1)}-${pad(day)}`; // JS months are 0-based
 }
 
 export const getAllEventData = async (): Promise<EventRecord[]> => {
@@ -51,10 +62,18 @@ export const getAllEventData = async (): Promise<EventRecord[]> => {
             allEvents = [...allEvents, ...data];
             page++;
 
-            // Stop if fewer than 100 records returned (last page)
             hasMore = data.length === 100;
         }
-
+        // Enrich each record with a computed startDate field
+        allEvents.forEach((item) => {
+            item.startDate = buildStartDate(
+                item.reqYear,
+                item.reqMonth,
+                item.reqDate
+            );
+        });
+        // Sort by reqJDate ascending
+        allEvents.sort((a, b) => a.reqJDate - b.reqJDate);
         return allEvents;
     } catch (err) {
         throw new Error(`getAllEventData error: ${err}`);

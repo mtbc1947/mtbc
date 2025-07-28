@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SEO } from 'components';
-import { getAllReferenceData, ReferenceRecord } from 'utilities';
+import { getAllRefData, RefDataRecord } from 'utilities';
 import { useAuth } from '../auth/AuthContext';
 
 interface LocationState {
@@ -19,22 +19,22 @@ const AdminPage: React.FC = () => {
   const [name, setName] = useState<string>(state?.adminName || '');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [referenceData, setReferenceData] = useState<ReferenceRecord[]>([]);
+  const [refData, setRefData] = useState<RefDataRecord[]>([]);
   const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
 
-  // Load reference data from localStorage or API
+  // Load refData from localStorage or API
   useEffect(() => {
-    const storedData = localStorage.getItem('referenceData');
+    const storedData = localStorage.getItem('refData');
     if (storedData) {
-      const parsedData: ReferenceRecord[] = JSON.parse(storedData);
-      setReferenceData(parsedData);
+      const parsedData: RefDataRecord[] = JSON.parse(storedData);
+      setRefData(parsedData);
       const options = Array.from(new Set(parsedData.map(item => item.webPage))).sort();
       setWebsiteOptions(options);
     } else {
       const getData = async () => {
-        const data = await getAllReferenceData();
-        setReferenceData(data);
-        localStorage.setItem('referenceData', JSON.stringify(data));
+        const data = await getAllRefData();
+        setRefData(data);
+        localStorage.setItem('refData', JSON.stringify(data));
         const options = Array.from(new Set(data.map(item => item.webPage))).sort();
         setWebsiteOptions(options);
         localStorage.setItem('websiteOptions', JSON.stringify(options));
@@ -56,7 +56,7 @@ const AdminPage: React.FC = () => {
       skipAuth(state.adminName || 'Admin');
       setError('');
     }
-    // We deliberately do NOT depend on referenceData here to avoid repeated calls
+    // We deliberately do NOT depend on refData here to avoid repeated calls
   }, [state, skipAuth]);
 
   // Clear error on successful authentication
@@ -66,14 +66,14 @@ const AdminPage: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  // Check password against the reference data value
+  // Check password against the refData value
   const checkPassword = () => {
-    if (referenceData.length === 0) {
+    if (refData.length === 0) {
       setError('System not ready. Try again shortly.');
       return;
     }
 
-    const refItem = referenceData.find(item => item.refKey === 'SD035');
+    const refItem = refData.find(item => item.refKey === 'SD035');
     const VALID_TOKEN = refItem?.value ?? '';
 
     if (password === VALID_TOKEN) {
@@ -90,9 +90,9 @@ const AdminPage: React.FC = () => {
 
   // Clear localStorage and logout
   const handleClearStorage = () => {
-    localStorage.removeItem('referenceData');
+    localStorage.removeItem('refData');
     localStorage.removeItem('websiteOptions');
-    setReferenceData([]);
+    setRefData([]);
     setWebsiteOptions([]);
     logout();
     setPassword('');
@@ -134,9 +134,9 @@ const AdminPage: React.FC = () => {
 
           <button
             onClick={checkPassword}
-            disabled={referenceData.length === 0}
+            disabled={refData.length === 0}
             className={`px-4 py-2 rounded text-white ${
-              referenceData.length === 0
+              refData.length === 0
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
@@ -149,7 +149,7 @@ const AdminPage: React.FC = () => {
           <h2 className="text-2xl font-bold">Welcome, {adminName || 'Admin'}!</h2>
 
           <Link
-            to="/maintainData"
+            to="/maintainRefData"
             state={{ skipAuth: true, adminName }}
             className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >

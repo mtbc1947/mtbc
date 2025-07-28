@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { SEO } from 'components';
-import { getReferenceValuesByPage } from 'utilities';
+import { getRefDataValuesByPage } from 'utilities';
 
 import  clubFront  from 'assets/club_front.jpg';
 import club from '../assets/match1.jpg';
@@ -14,7 +14,7 @@ const AboutUsPage: React.FC = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const data = await getReferenceValuesByPage("AboutUs");
+      const data = await getRefDataValuesByPage("AboutUs");
       // Assume data is string[]
       setStrings(data as string[]);
     };

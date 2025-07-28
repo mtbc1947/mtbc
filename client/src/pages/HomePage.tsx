@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 
-import { getReferenceValuesByPage } from '../utilities';
+import { getRefDataValuesByPage } from '../utilities';
 
 import homeBackground from '../assets/Home_2.jpg';
 import openDayImage from '../assets/OpenDay.jpg';
 import janYoneko from '../assets/jan_yoneko.jpg';
+import greenClosedImage from '../assets/green_closed_1.jpg';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const data = await getReferenceValuesByPage("Home");
+      const data = await getRefDataValuesByPage("Home");
       setStrings(data);
     };
     getData();
@@ -25,7 +26,9 @@ const HomePage: React.FC = () => {
   const wOpenDays = strings[1] || "MISSING"; // e.g., "7 days a week"
   const wGreenFees = strings[2] || "MISSING"; // e.g., "no green fees"
   const wOpenDay = strings[3] || "N"; // "Y" or "N"
+  const wGreenOpen = strings[4] || "N";
   const wOpenDayMkr = wOpenDay === "Y";
+  const wGreenOpenMkr = wGreenOpen === "Y";
 
   const handleImageButtonClick = () => {
     navigate('/openDay');
@@ -70,7 +73,21 @@ const HomePage: React.FC = () => {
             />
           </motion.button>
         )}
-
+        {/* Green Closed Overlay */}
+        {wGreenOpenMkr && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+            className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none"
+          >
+            <img
+              src={greenClosedImage}
+              alt="Green Closed"
+              className="w-64 h-64 md:w-80 md:h-80 object-contain drop-shadow-xl"
+            />
+          </motion.div>
+        )}
         {/* Text Content */}
         <article className="flex-1 text-black text-[18px] leading-relaxed">
           <p>

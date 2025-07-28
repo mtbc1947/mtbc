@@ -8,7 +8,7 @@ import cors from "cors";
 import mailjet from "node-mailjet";
 import connectDB from "./lib/connectDB.js";
 
-import referenceRouter from "./routes/reference.route.js";
+import refDataRouter from "./routes/refData.route.js";
 import eventRouter from "./routes/event.route.js";
 
 import imagesRouter from "./routes/images.js";
@@ -56,11 +56,10 @@ app.use(
 app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url} and body:`);
     console.log(req.body);
-    ``;
     next();
 });
 
-app.use("/reference", referenceRouter);
+app.use("/refData", refDataRouter);
 
 app.use("/event", eventRouter);
 

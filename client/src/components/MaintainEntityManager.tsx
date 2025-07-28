@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
-interface MaintainEntityManagerProps<T> {
+export type ColumnDescriptor<T> = {
+  label: string;
+  key: keyof T;
+  render?: (value: any, item: T) => React.ReactNode;
+  align?: 'left' | 'center' | 'right';
+  optional?: boolean;
+};
+
+type MaintainEntityManagerProps<T> = {
+  columns: ColumnDescriptor<T>[];
   entities: T[];
-  renderItem: (item: T, index: number) => React.ReactNode;
-  renderMobileItem: (item: T, index: number) => React.ReactNode;
   selectedItems: T[];
   onSelectItem: (item: T) => void;
   onSelectAll: (checked: boolean) => void;
@@ -11,12 +18,84 @@ interface MaintainEntityManagerProps<T> {
   onItemsPerPageChange: (value: number) => void;
   currentPage: number;
   onPageChange: (page: number) => void;
+  isSelected: (item: T) => boolean;
+  filterText?: string;
+  filterKey?: string;
+  filterFunction?: (item: T, filterText?: string, filterKey?: string) => boolean;
+};
+
+function MobileRow<T extends { [key: string]: any }>({
+  item,
+  columns,
+  isSelected,
+  onSelect,
+}: {
+  item: T;
+  columns: ColumnDescriptor<T>[];
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  const [showMore, setShowMore] = useState(false);
+  const requiredCols = columns.filter((col) => !col.optional);
+  const optionalCols = columns.filter((col) => col.optional);
+
+  return (
+    <div
+      className="flex items-center border rounded px-2 py-1 relative bg-white"
+      onTouchStart={() => setShowMore(true)}
+      onTouchEnd={() => setShowMore(false)}
+      onMouseEnter={() => setShowMore(true)}
+      onMouseLeave={() => setShowMore(false)}
+    >
+      {requiredCols.map((col, i) => {
+        const value = item[col.key];
+        const content = col.render ? col.render(value, item) : value;
+        return (
+          <div
+            key={i}
+            className={`flex-1 ${
+              col.align === 'center'
+                ? 'text-center'
+                : col.align === 'right'
+                ? 'text-right'
+                : 'text-left'
+            } truncate pr-2`}
+          >
+            {content}
+          </div>
+        );
+      })}
+
+      {optionalCols.length > 0 && (
+        <div className="relative text-gray-500 px-1 cursor-pointer">
+          {showMore ? (
+            <div className="absolute top-full left-0 z-10 mt-1 bg-white border rounded shadow-lg p-2 w-max max-w-[90vw]">
+              {optionalCols.map((col, i) => {
+                const value = item[col.key];
+                return (
+                  <div key={i} className="text-sm">
+                    <strong>{col.label}:</strong>{' '}
+                    {col.render ? col.render(value, item) : value}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <>…</>
+          )}
+        </div>
+      )}
+
+      <div className="w-8 text-center">
+        <input type="checkbox" checked={isSelected} onChange={onSelect} />
+      </div>
+    </div>
+  );
 }
 
-export function MaintainEntityManager<T>({
+export function MaintainEntityManager<T extends { [key: string]: any }>({
+  columns,
   entities,
-  renderItem,
-  renderMobileItem,
   selectedItems,
   onSelectItem,
   onSelectAll,
@@ -24,23 +103,38 @@ export function MaintainEntityManager<T>({
   onItemsPerPageChange,
   currentPage,
   onPageChange,
+  isSelected,
+  filterText,
+  filterKey,
+  filterFunction,
 }: MaintainEntityManagerProps<T>) {
-  const totalItems = entities.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = entities.slice(startIndex, startIndex + itemsPerPage);
+  
+  // Filter the entities before pagination
+  const filteredEntities = useMemo(() => {
+    if (!filterFunction) return entities;
 
-  const isSelected = (item: T) =>
-    selectedItems.includes(item); // assumes reference equality
+    return entities.filter((e) => filterFunction(e, filterText, filterKey));
+  }, [entities, filterFunction, filterText, filterKey]);
+  const totalItems = filteredEntities.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+
+  const currentItems = useMemo(
+    () =>
+      filteredEntities.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      ),
+    [filteredEntities, currentPage, itemsPerPage]
+  );
 
   const allSelected =
-    currentItems.length > 0 &&
-    currentItems.every((item) => isSelected(item));
+    currentItems.length > 0 && currentItems.every((item) => isSelected(item));
+  const requiredCols = columns.filter((c) => !c.optional);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="w-full">
       {/* Pagination Top */}
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm mb-2">
         <div>
           {selectedItems.length}/{totalItems} selected
         </div>
@@ -51,9 +145,7 @@ export function MaintainEntityManager<T>({
               type="number"
               min={1}
               value={itemsPerPage}
-              onChange={(e) =>
-                onItemsPerPageChange(Number(e.target.value))
-              }
+              onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
               className="ml-2 w-16 border rounded px-1 py-0.5"
             />
           </label>
@@ -73,21 +165,45 @@ export function MaintainEntityManager<T>({
         <table className="w-full table-auto">
           <thead>
             <tr className="bg-gray-100">
-              {/* Customize column headers if needed */}
-              <th className="p-2 text-left border">Date</th>
-              <th className="p-2 text-center border">Time</th>
-              <th className="p-2 text-left border">Subject</th>
-              <th className="p-2 text-center border">Venue</th>
-              <th className="p-2 text-center border">Dress</th>
-              <th className="p-2 text-center border">League</th>
-              <th className="p-2 text-center border">Team</th>
+              {columns.map((col, index) => (
+                <th
+                  key={index}
+                  className={`p-2 border ${
+                    col.align === 'center'
+                      ? 'text-center'
+                      : col.align === 'right'
+                      ? 'text-right'
+                      : 'text-left'
+                  }`}
+                >
+                  {col.label}
+                </th>
+              ))}
+              <th className="p-2 border text-center">✓</th>
             </tr>
           </thead>
           <tbody>
             {currentItems.map((item, index) => (
               <tr key={index} className="border-t">
-                {renderItem(item, index)}
-                <td className="p-2 text-center bg-green-200">
+                {columns.map((col, i) => {
+                  const value = item[col.key];
+                  const content = col.render ? col.render(value, item) : value;
+                  return (
+                    <td
+                      key={i}
+                      className={`p-2 border ${
+                        col.align === 'center'
+                          ? 'text-center'
+                          : col.align === 'right'
+                          ? 'text-right'
+                          : 'text-left'
+                      }`}
+                    >
+                      {content}
+                    </td>
+                  );
+                })}
+                <td className="p-2 border text-center">
                   <input
                     type="checkbox"
                     checked={isSelected(item)}
@@ -101,25 +217,39 @@ export function MaintainEntityManager<T>({
       </div>
 
       {/* Mobile View */}
-      <div className="md:hidden flex flex-col gap-2">
+      <div className="md:hidden flex flex-col gap-2 mt-4">
+        <div className="flex font-bold bg-gray-100 border p-2 rounded">
+          {requiredCols.map((col, index) => (
+            <div
+              key={index}
+              className={`flex-1 ${
+                col.align === 'center'
+                  ? 'text-center'
+                  : col.align === 'right'
+                  ? 'text-right'
+                  : 'text-left'
+              } truncate pr-2`}
+            >
+              {col.label}
+            </div>
+          ))}
+          {columns.some((c) => c.optional) && <div className="px-2">…</div>}
+          <div className="w-8 text-center">✓</div>
+        </div>
+
         {currentItems.map((item, index) => (
-          <div
+          <MobileRow
             key={index}
-            className="border rounded p-2 flex items-start gap-2"
-          >
-            <input
-              type="checkbox"
-              checked={isSelected(item)}
-              onChange={() => onSelectItem(item)}
-              className="mt-1"
-            />
-            <div className="flex-1">{renderMobileItem(item, index)}</div>
-          </div>
+            item={item}
+            columns={columns}
+            isSelected={isSelected(item)}
+            onSelect={() => onSelectItem(item)}
+          />
         ))}
       </div>
 
       {/* Pagination Bottom */}
-      <div className="flex justify-center gap-2 text-sm">
+      <div className="flex justify-center gap-2 mt-4 text-sm">
         <button
           disabled={currentPage === 1}
           onClick={() => onPageChange(1)}

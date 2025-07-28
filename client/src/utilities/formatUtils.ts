@@ -1,5 +1,5 @@
 // src/utilities/formatUtils.ts
-import { EventRecord } from "./eventDataUtils";
+import { EventRecord } from "./eventUtils";
 
 export function formatEventDate(event: EventRecord): string {
     const year = String(event.reqYear);

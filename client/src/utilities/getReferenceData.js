@@ -1,5 +1,5 @@
-export const getReferenceData = async (pWebPage) => {
-    console.log("getReferenceData v2", pWebPage);
+export const getRefData = async (pWebPage) => {
+    console.log("getRefData v2", pWebPage);
 
     try {
         let wReply = [];
@@ -7,9 +7,9 @@ export const getReferenceData = async (pWebPage) => {
         if (pWebPage) {
             wURL = `${
                 import.meta.env.VITE_BACKEND_URL
-            }/reference/webPage/${pWebPage}`;
+            }/refData/webPage/${pWebPage}`;
         } else {
-            wURL = `${import.meta.env.VITE_BACKEND_URL}/reference/`;
+            wURL = `${import.meta.env.VITE_BACKEND_URL}/refData/`;
         }
         const res = await fetch(
             // @ts-ignore
@@ -32,10 +32,10 @@ export const getReferenceData = async (pWebPage) => {
                 return data;
             }
         } else {
-            console.log("getReferencedData fail", res);
+            console.log("getRefData fail", res);
             return [];
         }
     } catch (err) {
-        throw new Error(`getReferenceData try-catch fail ${err}`);
+        throw new Error(`getRefData try-catch fail ${err}`);
     }
 };

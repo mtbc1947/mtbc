@@ -1,3 +1,3 @@
 // utilities/index.ts
-export * from "./referenceDataUtils";
-export * from "./eventDataUtils";
+export * from "./refDataUtils";
+export * from "./eventUtils";

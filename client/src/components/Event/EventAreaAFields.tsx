@@ -1,16 +1,22 @@
 import React from "react";
-import { EventRecord } from "../utilities/eventDataUtils";
+import { EventRecord } from "../../utilities/eventUtils";
 
 interface AreaAFieldsProps {
   editedEvent: EventRecord;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
 }
+//        value={getDateString("S", editedEvent.reqYear, editedEvent.reqMonth, editedEvent.reqDate)}
 
-const getDateString = (year?: number, month?: number, day?: number): string => {
+const getDateString = (style: string, year?: number, month?: number, day?: number): string => {
+  const months = ["Jan","Feb", "Mar", "Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
   if (year && month != null && day) {
-    const mm = String(month + 1).padStart(2, "0");
+    let mm = String(month + 1).padStart(2, "0");
+    if (style === "S`") {
+      mm = months[month];
+    }
     const dd = String(day).padStart(2, "0");
-    return `${year}-${mm}-${dd}`;
+    return `${dd}/${mm}`;
   }
   return "";
 };
@@ -22,7 +28,7 @@ const AreaAFields: React.FC<AreaAFieldsProps> = ({ editedEvent, onChange }) => (
       <input
         type="date"
         name="date"
-        value={getDateString(editedEvent.reqYear, editedEvent.reqMonth, editedEvent.reqDate)}
+        value={editedEvent.startDate ?? ""}
         onChange={onChange}
         className="border border-gray-300 rounded px-2 py-1"
       />

@@ -29,7 +29,7 @@ import { BookingPage } from 'pages';
 import { CountyPresidentsPage } from 'pages';
 import { PresidentsPage } from 'pages';
 import { AdminPage } from 'pages';
-import { MaintainDataPage } from 'pages';
+import { MaintainRefDataPage } from 'pages';
 import { MaintainEventPage } from 'pages';
 
 
@@ -54,7 +54,7 @@ const router = createBrowserRouter([
       { path: "/countyPresidents", element: <CountyPresidentsPage />, errorElement: <RouteError /> },
       { path: "/presidents", element: <PresidentsPage />, errorElement: <RouteError /> },
       { path: "/admin", element: <AdminPage />, errorElement: <RouteError /> },
-      { path: "/maintainData", element: <MaintainDataPage />, errorElement: <RouteError /> },
+      { path: "/maintainRefData", element: <MaintainRefDataPage />, errorElement: <RouteError /> },
       { path: "/maintainEvent", element: <MaintainEventPage />, errorElement: <RouteError /> },
     ],
   },
