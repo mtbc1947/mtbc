@@ -30,7 +30,7 @@ app.use(express.json());
 
 const allowedOrigins =
     process.env.NODE_ENV === "production"
-        ? [process.env.CLIENT_URL]
+        ? process.env.CLIENT_URL.split(",")
         : ["http://localhost:5173"];
 
 app.use(
