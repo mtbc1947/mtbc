@@ -44,7 +44,7 @@ app.use(
                 return callback(null, true);
             } else {
                 return callback(
-                    new Error("CORS not allowed from this origin"),
+                    new Error(`CORS not allowed from this origin [${origin}]`),
                     false
                 );
             }
