@@ -2,8 +2,8 @@ import React, { useState, useMemo, useEffect } from "react";
 import { getAllEventData, EventRecord } from "utilities";
 
 const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
 type Severity = "R" | "A" | "G";
@@ -36,7 +36,7 @@ function useMediaQuery(query: string): boolean {
 }
 
 function calculateEndTime(startTime: string, duration: number): string {
-  const [startHour, startMin] = startTime.split(":").map(Number);
+  const [startHour, startMin] = startTime.split(":" ).map(Number);
   const endHour = startHour + Math.floor(duration);
   const endMin = startMin + Math.round((duration % 1) * 60);
   const adjustedHour = endHour + Math.floor(endMin / 60);
@@ -102,7 +102,7 @@ export default function FixturesPage() {
     <div className="flex flex-col md:flex-row min-h-screen">
       {/* Filter panel */}
       <div
-        className={`fixed md:relative z-30 bg-white border-r border-gray-300 top-0 left-0 h-full w-64 transition-transform duration-300 ease-in-out
+        className={`fixed z-30 top-0 left-0 h-full w-64 bg-white border-r border-gray-300 transition-transform duration-300 ease-in-out
           ${isFiltersOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
@@ -119,7 +119,6 @@ export default function FixturesPage() {
               {label}
             </label>
           ))}
-
           <button
             onClick={() => setIsFiltersOpen(false)}
             className="mt-auto px-3 py-1 bg-gray-300 rounded self-start"
@@ -143,64 +142,76 @@ export default function FixturesPage() {
       )}
 
       {/* Main content */}
-      <div className="flex-1 p-2">
-        <div className="flex items-center justify-start mb-4 pl-4 space-x-2 max-w-md">
+      <div className="flex-1 relative overflow-hidden p-2 ml-14">
+        {/* Month selector container fixed at 50% of list width */}
+        <div className="w-1/3 ml-4 relative h-10 mb-4">
           <button
             onClick={prevMonth}
-            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
+            className="absolute left-0 top-0 h-10 px-3 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
           >
             &lt;
           </button>
 
-          <h1 className="text-2xl font-bold mx-2 whitespace-nowrap">
-            {monthNames[currentMonthIndex]}
-          </h1>
+          <div className="absolute left-0 right-0 top-0 h-10 flex items-center justify-center">
+            <h1 className="text-2xl font-bold text-center">
+              {monthNames[currentMonthIndex]}
+            </h1>
+          </div>
 
           <button
             onClick={nextMonth}
-            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
+            className="absolute right-0 top-0 h-10 px-3 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
           >
             &gt;
           </button>
         </div>
 
-        <ul className="space-y-2">
-          {(eventsByMonth[currentMonthIndex] || []).map((e) => {
-            const date = new Date(e.reqJDate);
-            const day = date.getDate();
-            const month = monthNames[date.getMonth()];
-            const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
-            const color = filterOptions.find(f => f.key === e.calKey)?.color || ["128", "128", "128"];
-            const rgb = `rgb(${color.join(",")})`;
-            const endTime = calculateEndTime(e.startTime, e.duration || 2);
+        {/* Fixture list in 2/3 width grey rectangle closer to left edge */}
+        <div className="flex justify-start">
+          <div className="bg-gray-100 rounded-2xl p-4 shadow-md w-2/3 ml-4">
+            <ul className="space-y-1">
+              {(eventsByMonth[currentMonthIndex] || []).map((e) => {
+                const date = new Date(e.reqJDate);
+                const day = date.getDate();
+                const month = monthNames[e.reqMonth];
+                const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
+                const color = filterOptions.find(f => f.key === e.calKey)?.color || ["128", "128", "128"];
+                const rgb = `rgb(${color.join(",")})`;
+                const endTime = calculateEndTime(e.startTime, e.duration || 2);
 
-            return (
-              <li
-                key={e.eventId}
-                onClick={() => setSelectedEvent(e)}
-                className="cursor-pointer px-4 py-3 rounded-md hover:bg-gray-100 flex items-center gap-4"
-              >
-                <div className="w-12 text-xl font-bold text-gray-800">{day}</div>
-                <div className="w-20 text-base text-gray-700">{month}</div>
-                <div className="w-14 text-base text-gray-600">{weekday}</div>
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: rgb }} />
-                <div className="flex-1 text-base text-gray-800">
-                  {e.startTime} – {endTime} | {e.homeAway === "H" ? "Home" : "Away"} | {e.subject}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                return (
+                  <li
+                    key={e.eventId}
+                    onClick={() => setSelectedEvent(e)}
+                    className="cursor-pointer px-4 py-1 rounded-md hover:bg-gray-200 flex items-center gap-4"
+                  >
+                    <div className="w-10 text-xl text-gray-800">{e.reqDate}</div>
+                    <div className="w-20 text-base text-gray-700">{month}</div>
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: rgb }} />
+                    <div className="text-base text-gray-800">
+                      {e.startTime} – {endTime} 
+                    </div>
+                    <div className="w-20 text-base text-gray-700">
+                      {e.homeAway === "H" ? "Home" : "Away"} 
+                    </div>
+                    <div className="text-base text-gray-700">{e.subject}</div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
       </div>
 
-      {/* Event details modal */}
+      {/* Event details modal - animated sliding in from right */}
       {selectedEvent && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 z-50"
           onClick={() => setSelectedEvent(null)}
         >
           <div
-            className="bg-white rounded p-6 max-w-md w-full relative"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-green-300 rounded-lg p-6 max-w-md w-full shadow-xl transition-transform duration-300 ease-in-out pointer-events-auto"
+            style={{ marginRight: "1rem", maxHeight: "90vh", overflowY: "auto", animation: "slideInRight 0.3s ease forwards" }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -217,6 +228,17 @@ export default function FixturesPage() {
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%) translateY(-50%);
+          }
+          to {
+            transform: translateX(0) translateY(-50%);
+          }
+        }
+      `}</style>
     </div>
   );
 }
