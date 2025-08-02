@@ -26,7 +26,6 @@ const mailjetClient = mailjet.apiConnect(
         options: {},
     }
 );
-app.use(express.json());
 
 const allowedOrigins =
     process.env.NODE_ENV === "production"
@@ -52,8 +51,13 @@ app.use(
         methods: ["GET", "POST", "PUT"],
         allowedHeaders: ["Content-Type"],
         credentials: true, // Optional: enable if using cookies/sessions
+        optionsSuccessStatus: 204, //Important for legacy browser support
     })
 );
+
+app.options("*", cors());
+
+app.use(express.json());
 
 app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url} and body:`);
