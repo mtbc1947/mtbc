@@ -1,6 +1,6 @@
 // models/member.model.ts
 import mongoose, { Schema, Document } from "mongoose";
-import { MemberDocument } from "../types/member";
+import { MemberDocument } from "../types/member.js";
 
 const memberSchema = new Schema<MemberDocument>(
     {

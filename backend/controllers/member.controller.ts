@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import Member from "../models/member.model";
-import { MemberDocument } from "../types/member";
+import Member from "../models/member.model.js";
+import { MemberDocument } from "../types/member.js";
 
-import { fetchOfficersForMember } from "./officer.controller";
+import { fetchOfficersForMember } from "./officer.controller.js";
 
 interface ParamsId {
     id: string;

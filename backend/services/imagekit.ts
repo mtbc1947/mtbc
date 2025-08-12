@@ -1,6 +1,6 @@
 // services/imagekit.ts
 import axios from "axios";
-import type { ImageResponse, ImageData } from "../types/imagekit";
+import type { ImageResponse, ImageData } from "../types/imagekit.js";
 
 export async function getImages(folderPath: string): Promise<ImageData[]> {
     const IK_PRIVATE_KEY = process.env.IK_PRIVATE_KEY;

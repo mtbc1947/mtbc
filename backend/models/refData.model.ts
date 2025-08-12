@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { RefDataDocument } from "../types/refData";
+import { RefDataDocument } from "../types/refData.js";
 
 const refDataSchema = new Schema<RefDataDocument>(
     {

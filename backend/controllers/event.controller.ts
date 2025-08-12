@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import Event from "../models/event.model";
-import { EventDocument } from "../types/event";
+import Event from "../models/event.model.js";
+import { EventDocument } from "../types/event.js";
 
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";

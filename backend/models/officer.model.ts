@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-import { OfficerDocument } from "../types/officer";
+import { OfficerDocument } from "../types/officer.js";
 
 const officerSchema = new Schema<OfficerDocument>(
     {

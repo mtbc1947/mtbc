@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 
-import Officer from "../models/officer.model";
-import { OfficerDocument } from "../types/officer";
+import Officer from "../models/officer.model.js";
+import { OfficerDocument } from "../types/officer.js";
 
 /** Get all officers, populated with member names */
 export const getAllOfficers = async (req: Request, res: Response) => {

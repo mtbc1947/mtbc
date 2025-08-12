@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import RefData from "../models/refData.model";
-import { RefDataDocument } from "../types/refData";
+import RefData from "../models/refData.model.js";
+import { RefDataDocument } from "../types/refData.js";
 
 export const getAllRefData = async (req: Request, res: Response) => {
     try {

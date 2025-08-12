@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { MemberDocument } from "./member"; // import Member interface if you have it
+import { MemberDocument } from "./member.js"; // import Member interface if you have it
 
 export interface OfficerAttrs {
     refKey: string;

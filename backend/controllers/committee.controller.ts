@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Committee from "../models/committee.model.js";
-import { CommitteeDocument } from "../types/committee";
+import { CommitteeDocument } from "../types/committee.js";
 
 import { fetchOfficersForCommittee } from "./officer.controller.js";
 

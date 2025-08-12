@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { EventDocument } from "../types/event";
+import { EventDocument } from "../types/event.js";
 
 const eventSchema = new Schema<EventDocument>(
     {

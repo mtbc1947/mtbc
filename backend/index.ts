@@ -3,7 +3,7 @@ const envFile =
     process.env.NODE_ENV === "production" ? ".env.production" : ".env";
 dotenv.config({ path: envFile });
 
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 //import mailjet from "node-mailjet";
 import connectDB from "./lib/connectDB.js";
@@ -128,7 +128,7 @@ app.get("/test", async (req, res) => {
     res.status(200).json({ message: "OK" });
 });
 
-app.use((error, req, res, next) => {
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     res.status(error.status || 500);
     res.json({
         message: error.message || "Soemthing went wrong",

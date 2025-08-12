@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { CommitteeDocument } from "../types/committee";
+import { CommitteeDocument } from "../types/committee.js";
 
 const committeeSchema = new Schema<CommitteeDocument>(
     {
