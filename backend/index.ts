@@ -10,7 +10,10 @@ import connectDB from "./lib/connectDB.js";
 
 import refDataRouter from "./routes/refData.route.js";
 import eventRouter from "./routes/event.route.js";
-import imagesRouter from "./routes/images.js";
+import imagesRouter from "./routes/images.route.js";
+import memberRouter from "./routes/member.route.js";
+import officerRouter from "./routes/officer.route.js";
+import committeeRouter from "./routes/committee.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -49,7 +52,7 @@ app.use(
                 );
             }
         },
-        methods: ["GET", "POST", "PUT"],
+        methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type"],
         credentials: true, // Optional: enable if using cookies/sessions
         optionsSuccessStatus: 204, //Important for legacy browser support
@@ -65,9 +68,10 @@ app.use((req, res, next) => {
 });
 
 app.use("/refData", refDataRouter);
-
+app.use("/member", memberRouter);
 app.use("/event", eventRouter);
-
+app.use("/officer", officerRouter);
+app.use("/committee", committeeRouter);
 app.use("/api/images", imagesRouter);
 
 /**
@@ -117,6 +121,10 @@ app.get("/test", async (req, res) => {
     console.log("Got /test");
     console.log("Headers", req.headers);
     console.log("Body", req.body);
+    res.set(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
     res.status(200).json({ message: "OK" });
 });
 

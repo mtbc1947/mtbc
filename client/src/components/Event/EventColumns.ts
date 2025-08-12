@@ -10,7 +10,7 @@ export function getEventColumns(): ColumnDescriptor<EventRecord>[] {
             label: "Date",
             align: "center",
             optional: false,
-            render: (val) => formatDateUKLong(val),
+            render: (val, row) => formatDateUKLong(val),
         },
         {
             key: "startTime",

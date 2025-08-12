@@ -1,6 +1,7 @@
 {
-  "watch": ["index.js", "routes", "services"],
-  "ext": "js,json",
-  "ignore": ["node_modules"],
-  "exec": "node index.js"
+  "watch": ["./**/*.ts"],
+  "ext": "ts,json",
+  "execMap": {
+    "ts": "ts-node --esm"
+  }
 }

@@ -4,18 +4,23 @@ import MaintainPageLayout from "../layouts/MaintainPageLayout";
 import { MaintainEntityManager } from "../components/MaintainEntityManager";
 import { Commands } from "../components/Commands";
 import backgroundImage from '../assets/green1.jpg';
-import { useAuth } from '../auth/AuthContext';  // Adjust path if needed
+import { useAuth } from '../auth/AuthContext';
+import { toast } from 'react-toastify';
 
 import { RefDataRecord } from "../utilities/refDataUtils";
 import { getRefDataColumns } from '../components/RefData/RefDataColumns';
 import EditFormArea from "../components/RefData/RefDataEditFormArea";
-import { createRefData, updateRefData } from 'utilities'; // adjust path as needed
+import { createRefData, updateRefData, deleteRefData, getAllRefData } from 'utilities'; // Adjust path as needed
+import FilterBar from '../components/FilterBar';
+import { useConfirmDialog } from "../hooks/useConfirmDialog";
 
 const MaintainRefDataPage: React.FC = () => {
-  const { isAuthenticated, adminName } = useAuth();
-  
+  const { confirm, dialog } = useConfirmDialog();
+  const { isAuthenticated } = useAuth();
+
   const [refData, setRefData] = useState<RefDataRecord[]>([]);
   const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
+  const [selectedPage, setSelectedPage] = useState<string>("");
 
   const [selectedItems, setSelectedItems] = useState<RefDataRecord[]>([]);
   const [isNewEdit, setIsNewEdit] = useState(false);
@@ -26,37 +31,35 @@ const MaintainRefDataPage: React.FC = () => {
 
   const [filterKey, setFilterKey] = useState('');
   const [filterText, setFilterText] = useState('');
-    
-  const [showToast, setShowToast] = useState(false);
-  const [selectedPage, setSelectedPage] = useState<string>("");
 
+  // Load all reference data on mount
   useEffect(() => {
-    const storedData = localStorage.getItem("refData");
-    const storedOptions = localStorage.getItem("websiteOptions");
+    const fetchData = async () => {
+      try {
+        const data = await getAllRefData();
+        setRefData(data);
 
-    if (storedData) {
-      const parsed: RefDataRecord[] = JSON.parse(storedData);
-      setRefData(parsed);
-    }
-
-    if (storedOptions) {
-      const parsed: string[] = JSON.parse(storedOptions);
-      setWebsiteOptions(parsed);
-      setSelectedPage(parsed[0] || "");
-    }
+        // Extract unique webPage values for websiteOptions
+        const uniquePages = Array.from(new Set(data.map(d => d.webPage?.trim() || "")))
+          .filter(x => x !== "")
+          .sort((a, b) => a.localeCompare(b));
+        
+        setWebsiteOptions(uniquePages);
+        setSelectedPage(uniquePages[0] || "");
+      } catch (error) {
+        console.error("Failed to load reference data:", error);
+        toast.error("Failed to load reference data");
+      }
+    };
+    fetchData();
   }, []);
 
-  //const filteredData = refData.filter((item) => item.webPage === selectedPage);
-    
-  const pageOptions = websiteOptions.map ( (item) => {
-    return {
-      key: item.trim(),
-      label: item.trim()
-    }
-  })
+  const pageOptions = websiteOptions.map(item => ({
+    key: item,
+    label: item,
+  }));
 
   const allOption = { key: '', label: 'All fields' };
-
   const filterOptions = [allOption, ...pageOptions];
 
   const RefDataFilterFunction = (e: RefDataRecord, filterText?: string, filterKey?: string): boolean => {
@@ -65,17 +68,14 @@ const MaintainRefDataPage: React.FC = () => {
 
     const matchesCalKey = key === '' || e.webPage?.trim().toLowerCase() === key;
 
-    // Case 1: No text, no filterKey — show everything
     if (trimmed === '' && key === '') {
       return true;
     }
 
-    // Case 2: No text, but filterKey is set — match on calKey only
     if (trimmed === '') {
       return matchesCalKey;
     }
 
-    // Case 3: filterText is present — match on text, restrict to filterKey if set
     const matchesText = Object.values(e).some(
       (val) => typeof val === 'string' && val.toLowerCase().includes(trimmed)
     );
@@ -84,27 +84,51 @@ const MaintainRefDataPage: React.FC = () => {
   };
 
   const isSelected = (item: RefDataRecord) =>
-    selectedItems.some((i) => i.refKey === item.refKey);
-  
+    selectedItems.some(i => i.refKey === item.refKey);
+
   const onSelectItem = (item: RefDataRecord) => {
-    setSelectedItems((prev) =>
-      prev.some((i) => i.refKey === item.refKey)
-        ? prev.filter((i) => i.refKey !== item.refKey)
+    setSelectedItems(prev =>
+      prev.some(i => i.refKey === item.refKey)
+        ? prev.filter(i => i.refKey !== item.refKey)
         : [...prev, item]
     );
   };
-  
+
+  interface ValidationResult {
+    valid: boolean;
+    error?: string;
+  }
+
+function validateRefData(refData: RefDataRecord | null | undefined): ValidationResult {
+    if (!refData) {
+      return { valid: false, error: "RefData is missing." };
+    }
+    if (!refData.webPage || refData.webPage.trim() === "") {
+      return { valid: false, error: "RefData webPage is required." };
+    }
+    if (!refData.refKey || refData.refKey.trim() === "") {
+      return { valid: false, error: "RefData refData is required." };
+    }
+    if (!refData.name || refData.name.trim() === "") {
+      return { valid: false, error: "RefData name is required." };
+    }
+    if (!refData.value || refData.value.trim() === "") {
+      return { valid: false, error: "RefData value is required." };
+    }
+    return { valid: true };
+  }
+
   const newRefData: RefDataRecord = {
-    refKey: ``,
+    refKey: '',
     webPage: 'Home',
     name: 'a new name',
     value: 'a new string',
   };
-  
+
   const handleCreate = () => {
     if (!isAuthenticated) return;
     setItemBeingEdited(newRefData);
-    setIsNewEdit(true); // <--- This is the fix
+    setIsNewEdit(true);
     setSelectedItems([]);
     setEditMode(true);
   };
@@ -112,13 +136,35 @@ const MaintainRefDataPage: React.FC = () => {
   const handleEditSelected = () => {
     if (!isAuthenticated || selectedItems.length !== 1) return;
     setItemBeingEdited(selectedItems[0]);
-    setIsNewEdit(false); // <--- This is an existing item
-    setEditMode(true);  
+    setIsNewEdit(false);
+    setEditMode(true);
   };
-  
-  const handleDeleteSelected = () => {
+
+  const handleDeleteSelected = async (): Promise<void> => {
     if (!isAuthenticated || selectedItems.length === 0) return;
-    setRefData((prev) => prev.filter((e) => !selectedItems.some((sel) => sel.refKey === e.refKey)));
+
+    const shouldDelete = await confirm({
+      title: "Delete Item",
+      message: "Are you sure you want to delete this item?",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+    });
+
+    if (!shouldDelete) return;
+
+    const refKey = selectedItems[0].refKey;
+    if (!refKey) return;
+
+    try {
+      await deleteRefData(refKey);
+      toast.success("Reference data deleted successfully");
+      setRefData(prev => prev.filter(e => e.refKey !== refKey));
+    } catch (error) {
+      console.log(`Delete failed: ${(error as Error).message}`);
+      toast.error(`Delete failed: ${(error as Error).message}`);
+    }
+    setEditMode(false);
+    setItemBeingEdited(null);
     setSelectedItems([]);
   };
 
@@ -132,55 +178,43 @@ const MaintainRefDataPage: React.FC = () => {
     if (!itemBeingEdited) return;
     try {
       let savedItem: RefDataRecord;
+            const result = validateRefData(itemBeingEdited);
+      if (!result.valid) {
+        toast.error(result.error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return; // Prevent update
+      }
 
       if (isNewEdit) {
         savedItem = await createRefData(itemBeingEdited);
+        toast.success("Data Item created successfully");
       } else {
         savedItem = await updateRefData(itemBeingEdited);
+        toast.success("Data Item updated successfully");
       }
 
-      setRefData((prev) =>
-        prev.some((e) => e.refKey === savedItem.refKey)
-          ? prev.map((e) => (e.refKey === savedItem.refKey ? savedItem : e))
-          : [...prev, savedItem]
-      );
+      setRefData(prev => {
+        const updated = prev.some(e => e.refKey === savedItem.refKey)
+          ? prev.map(e => (e.refKey === savedItem.refKey ? savedItem : e))
+          : [...prev, savedItem];
+
+        return [...updated].sort((a, b) => a.refKey.localeCompare(b.refKey));
+      });
 
       setEditMode(false);
       setItemBeingEdited(null);
       setSelectedItems([]);
     } catch (error) {
       console.error("Save error:", error);
+      toast.error((error as Error).message || "Failed to save data item");
     }
   };
-  /** 
-  const saveAllChanges = async () => {
-    try {
-      await updateRefData({filteredData});
-      localStorage.setItem("refData", JSON.stringify(data));
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      alert("Failed to save changes. Please try again.");
-    }
-  };
-
-  const onSaveItem = (updated: RefDataRecord) => {
-    setData((prev) =>
-      prev.map((item) => (item.refKey === updated.refKey ? updated : item))
-    );
-    setEditMode(false);
-    setSelectedItem(null);
-  };
-
-  const onDeleteSelected = () => {
-    if (!selectedItem) return;
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      setData((prev) => prev.filter((item) => item.refKey !== selectedItem.refKey));
-      setSelectedItem(null);
-    }
-  };
-  */
 
   if (!isAuthenticated) {
     return (
@@ -197,43 +231,30 @@ const MaintainRefDataPage: React.FC = () => {
         title="Maintain Reference Data – Maidenhead Town Bowls Club"
         description="Admin interface for editing reference data"
       />
+      <div>{dialog}</div>
       <MaintainPageLayout
         backgroundImage={backgroundImage as string}
-        editMode= { editMode }
+        title="Maintain Reference Data"
+        editMode={editMode}
         filter={
-          <div className="mb-6 space-y-2">
-            <div className="flex gap-2">
-              <select
-                className="p-2 border rounded"
-                value={filterKey}
-                onChange={(e) => setFilterKey(e.target.value)}
-              >
-                {filterOptions.map((opt) => (
-                  <option key={opt.label} value={opt.key}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Enter filter text"
-                className="flex-1 p-2 border rounded"
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-              />
-            </div>
-          </div>
+          <FilterBar
+            filterText={filterText}
+            setFilterText={setFilterText}
+            filterKey={filterKey}
+            setFilterKey={setFilterKey}
+            filterOptions={filterOptions}
+          />
         }
         commands={
           <Commands
             editMode={editMode}
             canEdit={selectedItems.length === 1 && isAuthenticated}
             canDelete={selectedItems.length > 0 && isAuthenticated}
-            onCreate={ handleCreate}
+            onCreate={handleCreate}
             onEdit={handleEditSelected}
             onDelete={handleDeleteSelected}
             onSave={handleSave}
-            onCancel={ handleCancel }
+            onCancel={handleCancel}
           />
         }
         editPanel={
@@ -241,16 +262,15 @@ const MaintainRefDataPage: React.FC = () => {
             <EditFormArea
               item={itemBeingEdited}
               setItem={setItemBeingEdited}
-              webPageOptions={ pageOptions }
-              isNew={isNewEdit} 
+              webPageOptions={pageOptions}
+              isNew={isNewEdit}
             />
           ) : null
         }
-
         listPanel={
           <MaintainEntityManager
             columns={getRefDataColumns()}
-            entities={ refData}
+            entities={refData}
             selectedItems={selectedItems}
             onSelectItem={onSelectItem}
             onSelectAll={(checked) => setSelectedItems(checked ? [...refData] : [])}
@@ -265,11 +285,6 @@ const MaintainRefDataPage: React.FC = () => {
           />
         }
       />
-      {showToast && (
-        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg">
-          Changes saved!
-        </div>
-      )}
     </div>
   );
 };

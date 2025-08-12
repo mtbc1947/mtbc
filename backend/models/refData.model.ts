@@ -1,7 +1,7 @@
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import { RefDataDocument } from "../types/refData";
 
-const refDataSchema = new Schema(
+const refDataSchema = new Schema<RefDataDocument>(
     {
         refKey: {
             type: String,
@@ -14,12 +14,16 @@ const refDataSchema = new Schema(
         },
         name: {
             type: String,
+            required: false,
         },
         value: {
             type: String,
+            required: false,
         },
     },
     { timestamps: true }
 );
 
-export default mongoose.model("RefData", refDataSchema);
+const RefData = mongoose.model<RefDataDocument>("RefData", refDataSchema);
+
+export default RefData;

@@ -2,8 +2,9 @@ import React from 'react';
 
 interface MaintainPageLayoutProps {
   backgroundImage: string;
+  title?: string;
   editMode: boolean;
-  filter: React.ReactNode;
+  filter?: React.ReactNode;
   commands: React.ReactNode;
   listPanel: React.ReactNode;
   editPanel?: React.ReactNode;
@@ -11,6 +12,7 @@ interface MaintainPageLayoutProps {
 
 const MaintainPageLayout: React.FC<MaintainPageLayoutProps> = ({
   backgroundImage,
+  title,
   editMode,
   filter,
   commands,
@@ -24,13 +26,12 @@ const MaintainPageLayout: React.FC<MaintainPageLayoutProps> = ({
     >
       <div className="min-h-screen bg-black bg-opacity-50 backdrop-blur-sm p-4">
         <header className="w-full bg-blue-800 text-white p-4 shadow-xl rounded-b-lg mb-4">
-          <h1 className="text-4xl font-extrabold text-center drop-shadow-lg">TITLE TO BE DONE</h1>
+          <h1 className="text-4xl font-extrabold text-center drop-shadow-lg">{ title }</h1>
         </header>
 
         <div className="p-4 max-w-7xl mx-auto rounded-xl bg-white bg-opacity-90 shadow-2xl space-y-4">
-          {/* Filter always on top */}
-          {filter}
-
+          {/* Filter (only if provided) */}
+          {filter && <div>{filter}</div>}
           {/* Main content: list/edit + commands */}
           <div className="flex flex-col md:flex-row gap-6">
             

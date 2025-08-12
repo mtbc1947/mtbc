@@ -1,6 +1,7 @@
 // utilities/refDataUtils.ts
 
 export interface RefDataRecord {
+    _id?: string;
     webPage: string;
     refKey: string;
     name: string;
@@ -120,5 +121,29 @@ export const updateAllRefData = async (
         }
     } catch (err) {
         throw new Error(`updateAllRefData error: ${err}`);
+    }
+};
+
+/**
+ * Deletes a refData record by its refKey.
+ */
+export const deleteRefData = async (refKey: string): Promise<void> => {
+    console.log(refKey);
+    if (!refKey) throw new Error("refKey is required for deletion.");
+
+    const url = `${import.meta.env.VITE_BACKEND_URL}/refData/${refKey}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Failed to delete refData: ${errorText}`);
+        }
+    } catch (err) {
+        throw new Error(`deleteRefData error: ${err}`);
     }
 };

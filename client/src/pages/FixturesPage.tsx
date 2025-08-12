@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { getAllEventData, EventRecord } from "utilities";
+import { SEO } from 'components';
 
 const monthNames = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -100,6 +101,10 @@ export default function FixturesPage() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
+      <SEO
+        title="Fixtures – Maidenhead Town Bowls Club"
+        description="Displays this season's fixture list"
+      />
       {/* Filter panel */}
       <div
         className={`fixed z-30 top-0 left-0 h-full w-64 bg-white border-r border-gray-300 transition-transform duration-300 ease-in-out

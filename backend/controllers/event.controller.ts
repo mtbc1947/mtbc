@@ -1,9 +1,11 @@
-import Event from "../models/event.model.js";
+import { Request, Response } from "express";
+
+import Event from "../models/event.model";
+import { EventDocument } from "../types/event";
+
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import csvParser from "csv-parser";
-import path from "path";
-
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -16,7 +18,15 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function emailFile({ filePath, originalName, rowCount }) {
+export async function emailFile({
+    filePath,
+    originalName,
+    rowCount,
+}: {
+    filePath: string;
+    originalName: string;
+    rowCount: number;
+}) {
     const info = await transporter.sendMail({
         from: `"CSV Importer" <${process.env.SMTP_FROM}>`,
         to: process.env.SMTP_TO,
@@ -28,13 +38,24 @@ export async function emailFile({ filePath, originalName, rowCount }) {
     console.log("Mailjet email sent:", info.messageId);
 }
 
-export const getEvents = async (req, res) => {
+export const getEvents = async (req: Request, res: Response): Promise<void> => {
     console.log("event.controller, getEvents");
-    const events = await Event.find();
-    res.status(200).json(events);
+    try {
+        const events: EventDocument[] = await Event.find().sort({
+            reqJDate: 1,
+            startTime: 1,
+        });
+        res.status(200).json(events);
+    } catch (err) {
+        console.error("Error fetching events:", err);
+        res.status(500).json({ message: "Failed to fetch events" });
+    }
 };
 
-export const createEvent = async (req, res) => {
+export const createEvent = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     try {
         const eventId = `EVT-${uuidv4()}`;
 
@@ -49,15 +70,18 @@ export const createEvent = async (req, res) => {
         console.log(newEvent);
 
         res.status(201).json(newEvent);
-    } catch (err) {
+    } catch (err: any) {
         console.error("Error creating event:", err);
         res.status(400).json({ message: err.message });
     }
 };
 
-export const updateEvent = async (req, res) => {
+export const updateEvent = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     try {
-        const eventId = req.params.id; // this is actually the custom eventId
+        const eventId = req.params.id; // custom eventId
         const updateData = req.body;
         console.log("event.controller, updateEvent ", eventId);
         console.log(updateData);
@@ -69,42 +93,46 @@ export const updateEvent = async (req, res) => {
         );
 
         if (!updatedEvent) {
-            return res.status(404).json({ message: "Event not found" });
+            res.status(404).json({ message: "Event not found" });
+            return;
         }
 
         res.status(200).json(updatedEvent);
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error updating event:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
 
-export const importEvents = async (req, res) => {
+export const importEvents = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     console.log("event.controller, importEvents");
 
-    console.log("req.file:", req.file); // <-- MUST be defined
-    console.log("req.body:", req.body);
-
     const file = req.file;
-    if (!file) return res.status(400).json({ error: "No file uploaded" });
-    console.log("File rxd");
+    if (!file) {
+        res.status(400).json({ error: "No file uploaded" });
+        return;
+    }
+
+    console.log("File received:", file.originalname);
     const filePath = file.path;
-    const validRows = [];
-    const validationErrors = [];
+    const validRows: Record<string, any>[] = [];
+    const validationErrors: Array<{ row: number; errors: string[] }> = [];
 
     try {
         let rowIndex = 0;
 
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             fs.createReadStream(filePath)
                 .on("error", (err) => {
                     console.error("Stream read error:", err);
-                    reject(err); // make sure this triggers the catch block
+                    reject(err);
                 })
                 .pipe(csvParser())
                 .on("data", (row) => {
                     try {
-                        console.log(row);
                         const error = validateEventRow(row, rowIndex);
                         if (error) {
                             validationErrors.push(error);
@@ -126,40 +154,41 @@ export const importEvents = async (req, res) => {
                     reject(err);
                 });
         });
-        console.log("finished validation");
+
         if (validationErrors.length > 0) {
-            return res.status(422).json({
+            res.status(422).json({
                 message: "Validation failed",
                 errors: validationErrors,
             });
+            return;
         }
-        console.log("Insert many rows");
-        //await Event.insertMany(validRows);
-        fs.unlink(filePath, () => {}); // safe now
 
-        // Optional: email even when valid (not shown here)
+        // TODO: Uncomment when ready to insert
+        // await Event.insertMany(validRows);
+        fs.unlink(filePath, () => {}); // safe to delete now
+
+        // Optionally send email notification here:
+        // await emailFile({ filePath, originalName: file.originalname, rowCount: validRows.length });
+
         res.status(200).json({
             message: "Import successful",
             inserted: validRows.length,
         });
-    } catch (err) {
+    } catch (err: any) {
         console.error(err);
         res.status(500).json({ error: "Import failed", details: err.message });
     }
 };
 
-function validateEventRow(row, index) {
-    const errors = [];
-    console.log(index, row);
-
-    //if (!row.eventType || row.eventTyoe.trim() === "") {
-    //    errors.push("Missing eventType");
-    //}
+function validateEventRow(
+    row: Record<string, string>,
+    index: number
+): { row: number; errors: string[] } | null {
+    const errors: string[] = [];
 
     if (!row.startDate) {
         errors.push("Invalid or missing start date");
     }
-
     if (!row.subject || row.subject.trim() === "") {
         errors.push("Missing subject");
     }
@@ -170,7 +199,5 @@ function validateEventRow(row, index) {
         errors.push("Missing venue");
     }
 
-    return errors.length
-        ? { row: index + 1, errors } // +1 for human-friendly row numbers
-        : null;
+    return errors.length > 0 ? { row: index + 1, errors } : null;
 }

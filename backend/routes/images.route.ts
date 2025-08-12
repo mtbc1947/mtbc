@@ -1,19 +1,21 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { getImages } from "../services/imagekit.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-    const folder = req.query.folder; // 👈 read from query string
+router.get("/", async (req: Request, res: Response) => {
+    const folder = req.query.folder;
 
-    if (!folder) {
-        return res.status(400).json({ error: "Missing folder parameter" });
+    if (!folder || typeof folder !== "string") {
+        return res
+            .status(400)
+            .json({ error: "Missing or invalid folder parameter" });
     }
 
     try {
         const images = await getImages(folder);
         res.json(images);
-    } catch (error) {
+    } catch (error: any) {
         console.error(
             "Error in /api/images:",
             error.response?.status,

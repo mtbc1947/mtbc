@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 export type ColumnDescriptor<T> = {
   label: string;
-  key: keyof T;
+  key: keyof T | (string & {});
   render?: (value: any, item: T) => React.ReactNode;
   align?: 'left' | 'center' | 'right';
   optional?: boolean;

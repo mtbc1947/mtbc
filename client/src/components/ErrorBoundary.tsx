@@ -27,6 +27,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return (
         <div className="p-4 text-center text-red-600">
           <h1 className="text-xl font-bold">Something went wrong.</h1>
+          <p>Error Boundary</p>
           <p>Please try again later.</p>
         </div>
       );

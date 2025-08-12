@@ -15,6 +15,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminName, setAdminName] = useState('');
   const [refData, setRefData] = useState<refDataRecord[]>([]);
+  const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
 
   // Load refData and auth state on mount
   useEffect(() => {
@@ -26,8 +27,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const data = await getAllRefData();
         localStorage.setItem('refData', JSON.stringify(data));
         setRefData(data);
+        const options = Array.from(new Set(data.map(item => item.webPage))).sort();
+        setWebsiteOptions(options);
+        localStorage.setItem('websiteOptions', JSON.stringify(options))    };
       }
-    };
 
     loadRefData();
 

@@ -117,6 +117,7 @@ export const updateEvent = async (event: EventRecord): Promise<EventRecord> => {
 
         if (!res.ok) {
             const errorText = await res.text();
+            console.log(`Failed to update event: ${errorText}`);
             throw new Error(`Failed to update event: ${errorText}`);
         }
 

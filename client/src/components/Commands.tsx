@@ -10,7 +10,7 @@ interface CommandsProps {
   onDelete: () => void;
   onSave: () => void;
   onCancel: () => void;
-  onUpload?: (file: File) => Promise<void>;
+  onUpload?: (file: File) => Promise<void>;  // optional
 }
 
 export function Commands({
@@ -55,7 +55,7 @@ export function Commands({
         setUploadMessage('Upload failed. Please try again.');
       } finally {
         setUploading(false);
-        event.target.value = ''; // Clear file input
+        event.target.value = ''; // Clear file input so same file can be re-uploaded
       }
     }
   };
@@ -102,24 +102,76 @@ export function Commands({
         <div className="flex flex-row md:flex-col gap-2 mb-4">
           {!editMode ? (
             <>
-              <button onClick={onCreate} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">New</button>
-              <button onClick={onEdit} disabled={!canEdit} className={`px-4 py-2 rounded w-full ${canEdit ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>Edit</button>
-              <button onClick={onDelete} disabled={!canDelete} className={`px-4 py-2 rounded w-full ${canDelete ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>Delete</button>
+              <button
+                onClick={onCreate}
+                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+              >
+                New
+              </button>
+              <button
+                onClick={onEdit}
+                disabled={!canEdit}
+                className={`px-4 py-2 rounded w-full ${
+                  canEdit ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Edit
+              </button>
+              <button
+                onClick={onDelete}
+                disabled={!canDelete}
+                className={`px-4 py-2 rounded w-full ${
+                  canDelete ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Delete
+              </button>
 
-              <button onClick={handleUploadClick} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">Upload CSV</button>
-              <input ref={fileInputRef} type="file" accept=".csv" onChange={handleFileChange} style={{ display: 'none' }} />
+              {/* Only show Upload CSV if onUpload prop exists */}
+              {onUpload && (
+                <>
+                  <button
+                    onClick={handleUploadClick}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+                  >
+                    Upload CSV
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                </>
+              )}
             </>
           ) : (
             <>
-              <button onClick={onSave} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">Save</button>
-              <button onClick={onCancel} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">Cancel</button>
+              <button
+                onClick={onSave}
+                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+              >
+                Save
+              </button>
+              <button
+                onClick={onCancel}
+                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+              >
+                Cancel
+              </button>
             </>
           )}
         </div>
 
         <div className="border-t border-gray-300 pt-3">
           <p className="text-sm font-medium text-gray-700 mb-1">Go To:</p>
-          <button onClick={handleMenuClick} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Menu</button>
+          <button
+            onClick={handleMenuClick}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          >
+            Menu
+          </button>
         </div>
       </div>
     </>

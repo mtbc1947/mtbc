@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SEO } from 'components';
-import { getAllRefData, RefDataRecord } from 'utilities';
 import { useAuth } from '../auth/AuthContext';
+import { getRefDataValuesByPage } from '../utilities';
 
 interface LocationState {
   error?: string;
@@ -19,28 +19,15 @@ const AdminPage: React.FC = () => {
   const [name, setName] = useState<string>(state?.adminName || '');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [refData, setRefData] = useState<RefDataRecord[]>([]);
-  const [websiteOptions, setWebsiteOptions] = useState<string[]>([]);
+  const [strings, setStrings] = useState<string[]>([]);
 
-  // Load refData from localStorage or API
+  // Load strings for admin page
   useEffect(() => {
-    const storedData = localStorage.getItem('refData');
-    if (storedData) {
-      const parsedData: RefDataRecord[] = JSON.parse(storedData);
-      setRefData(parsedData);
-      const options = Array.from(new Set(parsedData.map(item => item.webPage))).sort();
-      setWebsiteOptions(options);
-    } else {
-      const getData = async () => {
-        const data = await getAllRefData();
-        setRefData(data);
-        localStorage.setItem('refData', JSON.stringify(data));
-        const options = Array.from(new Set(data.map(item => item.webPage))).sort();
-        setWebsiteOptions(options);
-        localStorage.setItem('websiteOptions', JSON.stringify(options));
-      };
-      getData();
-    }
+    const getData = async () => {
+      const data = await getRefDataValuesByPage("Admin");
+      setStrings(data);
+    };
+    getData();
   }, []);
 
   // Show error from navigation state, if any
@@ -56,7 +43,6 @@ const AdminPage: React.FC = () => {
       skipAuth(state.adminName || 'Admin');
       setError('');
     }
-    // We deliberately do NOT depend on refData here to avoid repeated calls
   }, [state, skipAuth]);
 
   // Clear error on successful authentication
@@ -66,39 +52,26 @@ const AdminPage: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  // Check password against the refData value
-  const checkPassword = () => {
-    if (refData.length === 0) {
-      setError('System not ready. Try again shortly.');
-      return;
-    }
+    const wToken = strings[0] || "MISSING"; 
 
-    const refItem = refData.find(item => item.refKey === 'SD035');
-    const VALID_TOKEN = refItem?.value ?? '';
-
-    if (password === VALID_TOKEN) {
-      const success = login(name || 'Admin', password);
-      if (success) {
-        setError('');
-      } else {
-        setError('Login failed');
+    // Check password against the refData value
+    const checkPassword = () => {
+      if (!wToken) {
+        setError('System not ready. Try again shortly.');
+        return;
       }
-    } else {
-      setError('Incorrect password');
-    }
-  };
 
-  // Clear localStorage and logout
-  const handleClearStorage = () => {
-    localStorage.removeItem('refData');
-    localStorage.removeItem('websiteOptions');
-    setRefData([]);
-    setWebsiteOptions([]);
-    logout();
-    setPassword('');
-    setError('');
-  };
-
+      if (password === wToken) {
+        const success = login(name || 'Admin', password);
+        if (success) {
+          setError('');
+        } else {
+          setError('Login failed');
+        }
+      } else {
+        setError('Incorrect password');
+      }
+    };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <SEO
@@ -131,18 +104,14 @@ const AdminPage: React.FC = () => {
               className="w-full p-2 border rounded"
             />
           </div>
-
-          <button
-            onClick={checkPassword}
-            disabled={refData.length === 0}
-            className={`px-4 py-2 rounded text-white ${
-              refData.length === 0
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            Login
-          </button>
+          {password.length > 0 && (
+            <button
+              onClick={checkPassword}
+              className="px-4 py-2 rounded text-white bg-blue-600 hover:bg-blue-700"
+            >
+              Login
+            </button>
+          )}
         </div>
       ) : (
         <div className="text-center space-y-4">
@@ -164,18 +133,35 @@ const AdminPage: React.FC = () => {
             Maintain Event
           </Link>
 
+          <Link
+            to="/maintainMember"
+            state={{ skipAuth: true, adminName }}
+            className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Maintain Member
+          </Link>
+
+          <Link
+            to="/maintainCommittee"
+            state={{ skipAuth: true, adminName }}
+            className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Maintain Committee
+          </Link>
+
+          <Link
+            to="/maintainOfficer"
+            state={{ skipAuth: true, adminName }}
+            className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Maintain Officer
+          </Link>
+
           <button
             onClick={logout}
             className="block bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
           >
             Logout
-          </button>
-
-          <button
-            onClick={handleClearStorage}
-            className="block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Clear Stored Data
           </button>
         </div>
       )}

@@ -5,6 +5,7 @@ import { MaintainEntityManager } from '../components/MaintainEntityManager';
 import { Commands } from '../components/Commands';
 import backgroundImage from '../assets/green1.jpg';
 import { useAuth } from '../auth/AuthContext';
+import { toast } from 'react-toastify';
 
 import { getAllEventData } from 'utilities';
 import { EventRecord } from '../utilities/eventUtils';
@@ -12,6 +13,7 @@ import { getEventColumns } from '../components/Event/EventColumns';
 import EditFormArea from '../components/Event/EventEditFormArea';
 import { createEvent, updateEvent, importEvents } from 'utilities';
 import ValidationErrorPanel from '../components/ValidationErrorPanel';
+import FilterBar from '../components/FilterBar';
 
 const MaintainEventPage: React.FC = () => {
   const { isAuthenticated, adminName } = useAuth();
@@ -89,6 +91,28 @@ const MaintainEventPage: React.FC = () => {
     );
   };
 
+interface ValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
+function validateEvent(event: EventRecord | null | undefined): ValidationResult {
+    if (!event) {
+      return { valid: false, error: "Event data is missing." };
+    }
+    if (!event.subject || event.subject.trim() === "") {
+      return { valid: false, error: "Event subject is required." };
+    }
+    if (!event.startDate || event.startDate.trim() === "") {
+      return { valid: false, error: "Event start date is required." };
+    }
+    const date = new Date(event.startDate);
+    if (isNaN(date.getTime())) {
+      return { valid: false, error: "Event start date is invalid." };
+    }
+    return { valid: true };
+  }
+
   const newEvent: EventRecord = {
     eventId: ``,
     subject: 'New Event',
@@ -137,24 +161,45 @@ const MaintainEventPage: React.FC = () => {
     if (!itemBeingEdited) return;
     try {
       let savedItem: EventRecord;
+      const result = validateEvent(itemBeingEdited);
+      if (!result.valid) {
+        toast.error(result.error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return; // Prevent update
+      }
 
       if (!itemBeingEdited.eventId || itemBeingEdited.eventId.trim() === "") {
         savedItem = await createEvent(itemBeingEdited);
+        toast.success("Event created successfully");
       } else {
         savedItem = await updateEvent(itemBeingEdited);
+        toast.success("Event updated successfully");
       }
 
-      setEvents((prev) =>
-        prev.some((e) => e.eventId === savedItem.eventId)
+      setEvents((prev) => {
+        const updated = prev.some((e) => e.eventId === savedItem.eventId)
           ? prev.map((e) => (e.eventId === savedItem.eventId ? savedItem : e))
-          : [...prev, savedItem]
-      );
+          : [...prev, savedItem];
+
+        return [...updated].sort((a, b) => {
+          const dateDiff = a.reqJDate - b.reqJDate; // numeric compare
+          if (dateDiff !== 0) return dateDiff;
+          return a.startTime.localeCompare(b.startTime); // string compare
+        });
+      });
 
       setEditMode(false);
       setItemBeingEdited(null);
       setSelectedItems([]);
     } catch (error) {
       console.error("Save error:", error);
+      toast.error((error as Error).message || "Failed to save event");
     }
   };
 
@@ -201,30 +246,16 @@ const MaintainEventPage: React.FC = () => {
   return (
     <MaintainPageLayout
       backgroundImage={backgroundImage as string}
+      title="Maintain Events"
       editMode={editMode}
       filter={
-        <div className="mb-6 space-y-2">
-          <div className="flex gap-2">
-            <select
-              className="p-2 border rounded"
-              value={filterKey}
-              onChange={(e) => setFilterKey(e.target.value)}
-            >
-              {filterOptions.map((opt) => (
-                <option key={opt.key} value={opt.key}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Enter filter text"
-              className="flex-1 p-2 border rounded"
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-            />
-          </div>
-        </div>
+        <FilterBar
+          filterText={filterText}
+          setFilterText={setFilterText}
+          filterKey={filterKey}
+          setFilterKey={setFilterKey}
+          filterOptions={filterOptions}
+        />
       }
       commands={
         <Commands

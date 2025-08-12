@@ -31,31 +31,40 @@ import { PresidentsPage } from 'pages';
 import { AdminPage } from 'pages';
 import { MaintainRefDataPage } from 'pages';
 import { MaintainEventPage } from 'pages';
+import { MaintainMemberPage } from 'pages';
+import { MaintainCommitteePage } from 'pages';
+import { MaintainOfficerPage } from 'pages';
+import { NotFoundPage } from 'pages';
 
 
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
+    errorElement: <RouteError />,
     children: [
-      { path: "/", element: <HomePage />, errorElement: <RouteError /> },
-      { path: "/aboutUs", element: <AboutUsPage />, errorElement: <RouteError /> },
-      { path: "/history", element: <HistoryPage />, errorElement: <RouteError /> },
-      { path: "/officers", element: <OfficersPage />, errorElement: <RouteError /> },
-      { path: "/openDay", element: <OpenDayPage />, errorElement: <RouteError /> },
-      { path: "/social", element: <SocialPage />, errorElement: <RouteError /> },
-      { path: "/team/:league/:team", element: <TeamPage />, errorElement: <RouteError /> },
-      { path: "/noticeBoard", element: <NoticeBoardPage />, errorElement: <RouteError /> },
-      { path: "/newsReports", element: <NewsReportsPage />, errorElement: <RouteError /> },
-      { path: "/location", element: <LocationPage />, errorElement: <RouteError /> },
-      { path: "/contactUs", element: <ContactUsPage />, errorElement: <RouteError /> },
-      { path: "/privacy", element: <PrivacyPage />, errorElement: <RouteError /> },
-      { path: "/fixtures", element: <FixturesPage />, errorElement: <RouteError /> },
-      { path: "/booking", element: <BookingPage />, errorElement: <RouteError /> },
-      { path: "/countyPresidents", element: <CountyPresidentsPage />, errorElement: <RouteError /> },
-      { path: "/presidents", element: <PresidentsPage />, errorElement: <RouteError /> },
-      { path: "/admin", element: <AdminPage />, errorElement: <RouteError /> },
-      { path: "/maintainRefData", element: <MaintainRefDataPage />, errorElement: <RouteError /> },
-      { path: "/maintainEvent", element: <MaintainEventPage />, errorElement: <RouteError /> },
+      { path: "/", element: <HomePage /> },
+      { path: "/aboutUs", element: <AboutUsPage /> },
+      { path: "/history", element: <HistoryPage /> },
+      { path: "/officers", element: <OfficersPage /> },
+      { path: "/openDay", element: <OpenDayPage /> },
+      { path: "/social", element: <SocialPage /> },
+      { path: "/team/:league/:team", element: <TeamPage /> },
+      { path: "/noticeBoard", element: <NoticeBoardPage /> },
+      { path: "/newsReports", element: <NewsReportsPage /> },
+      { path: "/location", element: <LocationPage /> },
+      { path: "/contactUs", element: <ContactUsPage /> },
+      { path: "/privacy", element: <PrivacyPage /> },
+      { path: "/fixtures", element: <FixturesPage /> },
+      { path: "/booking", element: <BookingPage /> },
+      { path: "/countyPresidents", element: <CountyPresidentsPage /> },
+      { path: "/presidents", element: <PresidentsPage />},
+      { path: "/admin", element: <AdminPage /> },
+      { path: "/maintainRefData", element: <MaintainRefDataPage /> },
+      { path: "/maintainEvent", element: <MaintainEventPage /> },
+      { path: "/maintainMember", element: <MaintainMemberPage /> },
+      { path: "/maintainCommittee", element: <MaintainCommitteePage /> },
+      { path: "/maintainOfficer", element: <MaintainOfficerPage /> },
+      { path: '*', element: <NotFoundPage /> }
     ],
   },
 ]);
@@ -72,7 +81,7 @@ createRoot(rootElement).render(
       <AuthProvider>
         <ErrorBoundary>
           <RouterProvider router={router} />
-          <ToastContainer />
+          <ToastContainer position="top-right" autoClose={3000}/>
         </ErrorBoundary>
       </AuthProvider>
     </HelmetProvider>
