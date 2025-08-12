@@ -1,14 +1,24 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
-        "module": "ESNext",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
+        /* Output & Module Resolution */
+        "outDir": "dist", // Where compiled JS goes
+        "rootDir": "./", // Where your TS source starts
+        "module": "NodeNext", // ES Modules support for Node
+        "moduleResolution": "NodeNext", // Match Node's ESM behavior
+
+        /* Language Target */
+        "target": "ES2020", // Modern syntax, compatible with Node 18+
+        "lib": ["ES2020"], // Modern built-in APIs
+
+        /* Type Safety & Checking */
+        "strict": true, // Enable all strict checks
+        "esModuleInterop": true, // Allow default imports from CJS modules
         "forceConsistentCasingInFileNames": true,
-        "strict": true,
         "skipLibCheck": true,
-        "outDir": "./dist"
+
+        /* Source Maps for Debugging */
+        "sourceMap": true
     },
-    "include": ["./**/*.ts"],
-    "exclude": ["node_modules"]
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "dist"]
 }
