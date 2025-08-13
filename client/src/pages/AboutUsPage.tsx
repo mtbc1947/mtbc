@@ -31,7 +31,7 @@ const AboutUsPage: React.FC = () => {
 
   return (
     <div
-      className="bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans"
+      className="bg-cover bg-center min-h-screen py-2 px-25 md:p-16 text-black font-sans"
       style={{ backgroundImage: `url(${clubFront})` }}
     >
       <SEO
@@ -39,7 +39,7 @@ const AboutUsPage: React.FC = () => {
         description="Some background information about our bowls club."
       />
 
-      <div className="bg-white/70 p-6 md:p-10 rounded-md shadow-lg max-w-5xl mx-auto">
+      <div className="bg-white/70 p-2 md:p-10 rounded-md shadow-lg max-w-5xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">MAIDENHEAD TOWN BOWLS CLUB</h1>
         <p className="mb-4">
           MAIDENHEAD TOWN BOWLS CLUB prides itself on making new members

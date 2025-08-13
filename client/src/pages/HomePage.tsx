@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div
-      className="w-full flex-grow bg-cover bg-center p-6 text-black min-h-screen"
+      className="w-full flex-grow bg-cover bg-center py-4 px-25 text-black min-h-screen"
       style={{ backgroundImage: `url(${homeBackground})` }}
     >
       <SEO
@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
 
       {/* Content Box */}
       <section
-        className="relative rounded-2xl p-6 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-6"
+        className="relative rounded-2xl p-2 shadow-lg flex flex-col md:flex-row items-center md:items-start gap-6"
         style={{ backgroundColor: 'rgba(243, 244, 246, 0.7)' }} // ~30% opacity
       >
         {/* Animated Open Day Button */}

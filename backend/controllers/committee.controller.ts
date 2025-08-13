@@ -11,7 +11,6 @@ interface ParamsCommKey {
 export const getAllCommittees = async (req: Request, res: Response) => {
     console.log("committee.controller, getAllCommittees");
     const committees: CommitteeDocument[] = await Committee.find().sort({
-        commKey: 1,
         order: 1,
     });
     res.status(200).json(committees);

@@ -68,7 +68,7 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="bg-white shadow-md py-2 px-6 h-20 md:h-24 relative z-50">
+    <header className="shadow-md py-2 px-6 h-20 md:h-24 relative z-50">
       <div className="flex md:items-center">
         <Link to="/">
           <img src={logo} alt="Logo" className="h-16 md:h-20 w-auto mr-4" />
@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
           <h1 className="text-xl md:text-2xl font-bold leading-tight">Maidenhead Town</h1>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex flex-wrap gap-10 text-base text-black font-medium mt-1 relative z-50">
+          <nav className="hidden md:flex flex-wrap gap-1 tb:gap-8 lg:gap-12 xl:gap-20 text-base text-black font-medium mt-1 relative z-50">
             {menuGroups.map((menu) => (
               <div key={menu.label} className="relative group">
                 <button className="flex items-center gap-2 hover:text-indigo-600">

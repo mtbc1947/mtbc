@@ -6,24 +6,18 @@ import Footer from '../components/Footer';
 import mainBackground from '../assets/green1.jpg';
 
 const MainLayout: React.FC = () => {
-  const [isDimmed, setIsDimmed] = useState(true);
-
-  const toggleBrightness = () => {
-    setIsDimmed((prev) => !prev);
-  };
 
   return (
     <div className="relative min-h-screen flex flex-col text-black">
       {/* Background Image */}
       <div
-        className={`absolute inset-0 g-cover bg-center z-0`}
-        style={{ backgroundImage: `url(${mainBackground})` }}
+        className="absolute inset-0 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${mainBackground})`,
+          backgroundSize: '170%', // smaller zoom than bg-cover
+          opacity: 0.6, 
+        }}
       />
-
-      {/* Optional Dark Overlay */}
-      {isDimmed && (
-        <div className="absolute inset-0 bg-black/25 z-0 transition-opacity duration-300" />
-      )}
 
       {/* Main Content: flex column with Navbar, Outlet fills space, Footer at bottom */}
       <div className="relative z-10 flex flex-col flex-1 min-h-screen">
@@ -34,7 +28,7 @@ const MainLayout: React.FC = () => {
           <Outlet />
         </main>
 
-        <Footer isDimmed={isDimmed} toggleBrightness={toggleBrightness} />
+        <Footer />
       </div>
     </div>
   );
