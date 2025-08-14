@@ -24,12 +24,12 @@ const MaintainPageLayout: React.FC<MaintainPageLayoutProps> = ({
       className="min-h-screen bg-gray-100 font-inter text-gray-800 bg-cover bg-center"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div className="min-h-screen bg-black bg-opacity-50 backdrop-blur-sm p-4">
-        <header className="w-full bg-blue-800 text-white p-4 shadow-xl rounded-b-lg mb-4">
+      <div className="min-h-screen bg-opacity-50 backdrop-blur-sm p-4">
+        <header className="w-full text-gray-700  rounded-b-lg mb-4">
           <h1 className="text-4xl font-extrabold text-center drop-shadow-lg">{ title }</h1>
         </header>
 
-        <div className="p-4 max-w-7xl mx-auto rounded-xl bg-white bg-opacity-90 shadow-2xl space-y-4">
+        <div className="p-4 max-w-7xl mx-auto rounded-xl bg-gray-300 bg-opacity-90 shadow-2xl space-y-4">
           {/* Filter (only if provided) */}
           {filter && <div>{filter}</div>}
           {/* Main content: list/edit + commands */}

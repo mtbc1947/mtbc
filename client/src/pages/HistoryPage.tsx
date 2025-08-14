@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
+import ScreenInfoOverlay from "../components/ScreenInfoOverlay";
 
 import trophies from "../assets/prize1.jpg";
 import green1 from "../assets/green1.jpg";
@@ -11,6 +12,7 @@ const HistoryPage: React.FC = () => {
       className="bg-cover bg-center min-h-screen p-6 md:p-16 text-black font-sans"
       style={{ backgroundImage: `url(${green1})` }}
     >
+      <ScreenInfoOverlay />
       <SEO
         title="HistoryPage – Maidenhead Town Bowls Club"
         description="A short history of the club."

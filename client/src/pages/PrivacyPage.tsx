@@ -48,7 +48,7 @@ const PrivacyPage: React.FC = () => {
             key={index}
             className={`flex items-center gap-2 py-2 px-4 rounded-full font-medium text-sm sm:text-base transition-colors border ${
               activeTab === index
-                ? 'bg-blue-600 text-white border-blue-700'
+                ? 'bg-yellow-600 text-white border-yello-700'
                 : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-blue-100 dark:hover:bg-blue-700'
             }`}
             onClick={() => setActiveTab(index)}
@@ -65,7 +65,7 @@ const PrivacyPage: React.FC = () => {
           href={viewUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded shadow text-sm font-medium transition"
+          className="inline-block px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded shadow text-sm font-medium transition"
         >
           🔗 Open PDF in a New Tab
         </a>

@@ -168,7 +168,7 @@ export function Commands({
           <p className="text-sm font-medium text-gray-700 mb-1">Go To:</p>
           <button
             onClick={handleMenuClick}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
           >
             Menu
           </button>

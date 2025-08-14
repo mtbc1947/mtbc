@@ -3,12 +3,14 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+
 import mainBackground from '../assets/green1.jpg';
 
 const MainLayout: React.FC = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col text-black">
+
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-center bg-no-repeat"
