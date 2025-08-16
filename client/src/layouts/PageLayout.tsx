@@ -11,7 +11,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
       className="min-h-screen bg-cover bg-center text-black"
       style={{ backgroundImage: `url(${pageBackground})` }}
     >
-      <div className="bg-red-600 max-w-5xl mx-auto px-4 py-8 shadow-lg">
+      <div className="bg-gray-400 max-w-5xl mx-auto px-4 py-8 shadow-lg">
         {children}
       </div>
     </div>

@@ -1,20 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { IoMdArrowDropdown } from "react-icons/io";
 import logo from "../assets/mtbc_3.jpg";
+import MenuGroup, { MenuGroupIf } from "./MenuGroup";
 
-interface MenuItem {
-  label: string;
-  to: string;
-}
-
-interface MenuGroup {
-  label: string;
-  key: string;
-  items: MenuItem[];
-}
-
-const menuGroup1: MenuGroup[] = [
+// Menu definitions
+const menuGroup1: MenuGroupIf[] = [
   {
     label: "About Us",
     key: "about",
@@ -50,77 +40,17 @@ const menuGroup1: MenuGroup[] = [
   },
 ];
 
-const menuGroup2: MenuGroup[] = [
+const menuGroup2: MenuGroupIf[] = [
   {
     label: "More",
     key: "more",
     items: [
       { label: "County Presidents", to: "/countyPresidents" },
       { label: "Presidents", to: "/presidents" },
-      { label: "Admin`", to: "/admin" },
+      { label: "Admin", to: "/admin" },
     ],
   },
 ];
-
-interface MenuGroupComponentProps {
-  menu: MenuGroup;
-  isMobile?: boolean;
-  dropdown?: string | null;
-  setDropdown?: (key: string | null) => void;
-  closeMenu?: () => void;
-}
-
-const MenuGroupComponent: React.FC<MenuGroupComponentProps> = ({
-  menu,
-  isMobile = false,
-  dropdown,
-  setDropdown,
-  closeMenu,
-}) => {
-  const toggleDropdown = () => {
-    if (setDropdown) setDropdown(dropdown === menu.key ? null : menu.key);
-  };
-
-  if (isMobile) {
-    return (
-      <div>
-        <button
-          onClick={toggleDropdown}
-          className="flex w-full items-center justify-between px-2 py-1 hover:text-indigo-600"
-        >
-          {menu.label} <IoMdArrowDropdown />
-        </button>
-        {dropdown === menu.key && (
-          <div className="pl-4 flex flex-col gap-1">
-            {menu.items.map((item) => (
-              <Link key={item.to} to={item.to} onClick={closeMenu}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Desktop version
-  return (
-    <div className="relative group">
-      <button className="flex items-center gap-2 hover:text-indigo-600">
-        {menu.label} <IoMdArrowDropdown />
-      </button>
-      <div className="absolute left-0 top-full invisible opacity-0 group-hover:visible group-hover:opacity-100 transition
-        bg-white shadow-md rounded-md py-2 px-4 mt-1 min-w-max flex flex-col whitespace-nowrap z-50"
-      >
-        {menu.items.map((item) => (
-          <Link key={item.to} to={item.to} className="py-1 hover:text-indigo-600">
-            {item.label}
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -131,37 +61,91 @@ const Navbar: React.FC = () => {
     setDropdown(null);
   };
 
+  // Refs for keyboard navigation
+  const topLevelRefs = useRef<Array<HTMLButtonElement | HTMLAnchorElement | null>>([]);
+
+  const handleTopLevelKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    const refs = topLevelRefs.current;
+    if (!refs.length) return;
+
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = (idx + 1) % refs.length;
+      refs[next]?.focus();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const prev = (idx - 1 + refs.length) % refs.length;
+      refs[prev]?.focus();
+    }
+  };
+
   return (
     <header className="shadow-md py-2 px-6 h-20 md:h-24 relative z-50">
       <div className="flex md:items-center">
-        <Link to="/">
-          <img src={logo} alt="Logo" className="h-16 md:h-20 w-auto mr-4" />
+        <Link to="/" className="mr-4">
+          <img src={logo} alt="Logo" className="h-16 md:h-20 w-auto" />
         </Link>
 
         <div className="flex flex-col justify-center w-full">
           <h1 className="text-xl md:text-2xl font-bold leading-tight">Maidenhead Town</h1>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex flex-wrap gap-1 tb:gap-8 lg:gap-12 xl:gap-20 text-base text-black font-medium mt-1 relative z-50">
-            {menuGroup1.map((menu) => (
-              <MenuGroupComponent key={menu.key} menu={menu} />
+          <nav
+            className="hidden md:flex flex-wrap gap-1 tb:gap-8 lg:gap-12 xl:gap-20 text-base text-black font-medium mt-1 relative z-50"
+            role="menubar"
+          >
+            {menuGroup1.map((menu, idx) => (
+              <MenuGroup
+                key={menu.key}
+                menu={menu}
+                isMobile={false}
+                ref={(el: HTMLButtonElement | null) =>
+                  (topLevelRefs.current[idx] = el)
+                }
+              />
             ))}
 
             {/* Non-dropdown links */}
-            <Link to="/fixtures" className="hover:text-indigo-600">Fixtures</Link>
-            <Link to="/booking" className="hover:text-indigo-600">Booking</Link>
-            <Link to="/location" className="hover:text-indigo-600">Location</Link>
-            <Link to="/contactUs" className="hover:text-indigo-600">Contact</Link>
+            {["/fixtures", "/booking", "/location", "/contactUs"].map((to, idx) => {
+              const labels = ["Fixtures", "Booking", "Location", "Contact"];
+              const refIndex = menuGroup1.length + idx;
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className="hover:text-indigo-600"
+                  role="menuitem"
+                  ref={(el) => (topLevelRefs.current[refIndex] = el)}
+                  onKeyDown={(e) => handleTopLevelKeyDown(e, refIndex)}
+                >
+                  {labels[idx]}
+                </Link>
+              );
+            })}
 
-            {menuGroup2.map((menu) => (
-              <MenuGroupComponent key={menu.key} menu={menu} />
-            ))}
+            {menuGroup2.map((menu, idx) => {
+              const refIndex = menuGroup1.length + 4 + idx;
+              return (
+                <MenuGroup
+                  key={menu.key}
+                  menu={menu}
+                  isMobile={false}
+                  ref={(el: HTMLButtonElement | null) =>
+                    (topLevelRefs.current[refIndex] = el)
+                  }
+                />
+              );
+            })}
           </nav>
         </div>
 
         {/* Mobile toggle */}
         <div className="flex justify-between items-center md:hidden mt-4">
-          <button onClick={() => setOpen(!open)} aria-label="Toggle Menu" className="text-2xl">
+          <button
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle Menu"
+            className="text-2xl"
+          >
             ☰
           </button>
         </div>
@@ -171,7 +155,7 @@ const Navbar: React.FC = () => {
       {open && (
         <nav className="flex flex-col bg-white md:hidden mt-1 gap-2 text-base text-black font-medium w-full">
           {menuGroup1.map((menu) => (
-            <MenuGroupComponent
+            <MenuGroup
               key={menu.key}
               menu={menu}
               isMobile
@@ -181,13 +165,22 @@ const Navbar: React.FC = () => {
             />
           ))}
 
-          <Link to="/fixtures" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Fixtures</Link>
-          <Link to="/booking" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Booking</Link>
-          <Link to="/location" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Location</Link>
-          <Link to="/contactUs" onClick={closeMenu} className="px-2 py-1 hover:text-indigo-600">Contact</Link>
+          {["/fixtures", "/booking", "/location", "/contactUs"].map((to, idx) => {
+            const labels = ["Fixtures", "Booking", "Location", "Contact"];
+            return (
+              <Link
+                key={to}
+                to={to}
+                onClick={closeMenu}
+                className="px-2 py-1 hover:text-indigo-600"
+              >
+                {labels[idx]}
+              </Link>
+            );
+          })}
 
           {menuGroup2.map((menu) => (
-            <MenuGroupComponent
+            <MenuGroup
               key={menu.key}
               menu={menu}
               isMobile

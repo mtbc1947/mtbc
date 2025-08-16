@@ -13,6 +13,9 @@ export default defineConfig({
         proxy: {
             "/api": "http://localhost:4000",
         },
+        host: true, // listen on all network interfaces
+        port: 5173, // optional, default is 5173
+        allowedHosts: ["all"],
     },
     resolve: {
         alias: {
