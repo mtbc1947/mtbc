@@ -35,24 +35,39 @@ const CountyPresidentsPage: React.FC = () => {
       });
   }, []);
 
-  if (loading) return <p className="text-center">Loading images...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (loading) {
+    return (
+      <div className="w-full flex items-center justify-center p-4 bg-white/70 rounded-md shadow-lg mx-4 md:mx-8">
+        <p className="text-center">Loading images...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex items-center justify-center p-4 bg-white/70 rounded-md shadow-lg mx-4 md:mx-8">
+        <p className="text-center text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="w-full h-full flex items-center justify-center p-4  rounded-md shadow-lg mx-4 md:mx-8">
       <SEO
         title="CountyPresidentsPage – Maidenhead Town Bowls Club"
         description="A gallery of the members of the club who were or are also County Presidents"
       />
-      {images.map((img) => (
-        <div key={img.id} className="overflow-hidden rounded-lg shadow-md">
-          <img
-            src={img.url}
-            alt={img.name}
-            className="w-full h-80 object-contain transition-transform duration-300 hover:scale-105"
-          />
-        </div>
-      ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {images.map((img) => (
+          <div key={img.id} className="overflow-hidden rounded-lg shadow-md">
+            <img
+              src={img.url}
+              alt={img.name}
+              className="w-full h-80 object-contain transition-transform duration-300 hover:scale-105"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

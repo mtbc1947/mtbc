@@ -73,7 +73,7 @@ const AdminPage: React.FC = () => {
       }
     };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="flex items-center justify-center p-4">
       <SEO
         title="AdminPage – Maidenhead Town Bowls Club"
         description="Provides access to the Administration features"

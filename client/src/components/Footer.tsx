@@ -1,7 +1,6 @@
 import React from "react";
 import { FaFacebookF } from "react-icons/fa";
 
-
 const Footer: React.FC = () => {
   const wYear = new Date().getFullYear();
 
@@ -14,7 +13,7 @@ const Footer: React.FC = () => {
           © Maidenhead Town Bowls Club {wYear}
         </div>
 
-         {/* Right */}
+        {/* Right */}
         <div className="text-right w-full sm:w-1/3 flex justify-end">
           <a
             href="https://www.facebook.com/maidenheadtownbowlsclub/?locale=en_GB"

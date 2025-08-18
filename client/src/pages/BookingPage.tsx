@@ -3,13 +3,23 @@ import SEO from '../components/SEO';
 
 const BookingPage: React.FC = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    // Outer container: now takes up full height and centers content
+    <div className="flex items-center justify-center min-h-full w-full py-4 px-25 text-black">
       <SEO
         title="BookingPage – Maidenhead Town Bowls Club"
         description="Provides a link to the Booking facility provided by BowlR"
       />
-      <div className="bg-gray-200 rounded-2xl shadow-md p-10 text-center">
-        <h1 className="text-2xl font-bold text-gray-800">Link to BowlR</h1>
+      {/* Inner container: the rectangle that holds the content */}
+      <div className="bg-white/70 rounded-2xl shadow-md p-10 text-center flex flex-col items-center w-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Link to BowlR</h1>
+        <a
+          href="https://bowlrbc.co.uk/club-booking-2/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full inline-block"
+        >
+          Book Now
+        </a>
       </div>
     </div>
   );

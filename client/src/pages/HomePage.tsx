@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 
 import { getRefDataValuesByPage } from '../utilities';
 
-import homeBackground from '../assets/Home_2.jpg';
+// import homeBackground from '../assets/Home_2.jpg'; //
 import openDayImage from '../assets/OpenDay.jpg';
 import janYoneko from '../assets/jan_yoneko.jpg';
 import greenClosedImage from '../assets/green_closed_1.jpg';
@@ -35,10 +35,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div
-      className="w-full flex-grow bg-cover bg-center py-4 px-25 text-black min-h-screen"
-      style={{ backgroundImage: `url(${homeBackground})` }}
-    >
+    <div className="w-full py-4 px-4 md:px-25 text-black">      
       <SEO
         title="HomePage – Maidenhead Town Bowls Club"
         description="The club web site's home page"

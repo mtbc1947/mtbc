@@ -39,21 +39,23 @@ const PresidentsPage: React.FC = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="w-full flex items-center justify-center rounded-md shadow-lg mx-4 md:mx-8">
       <SEO
         title="PresidentsPage – Maidenhead Town Bowls Club"
         description="A gallery of the past and current presidents of the club"
       />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-      {images.map((img) => (
-        <div key={img.id} className="overflow-hidden rounded-lg shadow-md">
-          <img
-            src={img.url}
-            alt={img.name}
-            className="w-full h-80 object-contain transition-transform duration-300 hover:scale-105"
-          />
-        </div>
-      ))}
+        {images.map((img) => (
+          <div key={img.id} className="overflow-hidden rounded-lg shadow-md">
+            <img
+              src={img.url}
+              alt={img.name}
+              className="w-full h-60 object-contain transition-transform duration-300 hover:scale-105"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

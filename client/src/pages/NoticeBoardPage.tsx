@@ -3,7 +3,7 @@ import SEO from '../components/SEO';
 
 const NoticeBoardPage: React.FC = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center">
       <SEO
         title="NoticeBoardPage – Maidenhead Town Bowls Club"
         description="A list of the notices published on the club's noticeboard"

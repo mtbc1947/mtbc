@@ -1,37 +1,44 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+// MainLayout.tsx
+import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+interface MainLayoutProps {
+  backgroundImage?: string;
+  centerContent?: boolean;
+  children: React.ReactNode;
+}
 
-import mainBackground from '../assets/green1.jpg';
-
-const MainLayout: React.FC = () => {
-
+const MainLayout: React.FC<MainLayoutProps> = ({ backgroundImage, centerContent = false, children }) => {
   return (
-    <div className="relative min-h-screen flex flex-col text-black">
-
+    <div className="relative text-black min-h-screen flex flex-col">
       {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${mainBackground})`,
-          backgroundSize: '170%', // smaller zoom than bg-cover
-          opacity: 0.6, 
-        }}
-      />
+      {backgroundImage && (
+        <div
+          className="absolute inset-0 bg-center bg-no-repeat -z-10"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            opacity: 0.6,
+          }}
+        />
+      )}
 
-      {/* Main Content: flex column with Navbar, Outlet fills space, Footer at bottom */}
-      <div className="relative z-10 flex flex-col flex-1 min-h-screen">
-        <Navbar />
+      {/* Main Content Wrapper */}
+      <Navbar />
+      
+      <main
+        className={`
+          relative z-10
+          ${centerContent
+            ? 'flex items-center justify-center min-h-[calc(100vh-64px-64px)]'
+            : 'px-4 py-6 sm:px-6 sm:py-8'}
+        `}
+      >
+        {children}
+      </main>
 
-        {/* Main content area fills the remaining space */}
-        <main className="flex-grow">
-          <Outlet />
-        </main>
-
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 };

@@ -7,8 +7,6 @@ const monthNames = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-type Severity = "R" | "A" | "G";
-
 interface FilterOption {
   key: string;
   label: string;
@@ -37,7 +35,7 @@ function useMediaQuery(query: string): boolean {
 }
 
 function calculateEndTime(startTime: string, duration: number): string {
-  const [startHour, startMin] = startTime.split(":" ).map(Number);
+  const [startHour, startMin] = startTime.split(":").map(Number);
   const endHour = startHour + Math.floor(duration);
   const endMin = startMin + Math.round((duration % 1) * 60);
   const adjustedHour = endHour + Math.floor(endMin / 60);
@@ -64,8 +62,11 @@ export default function FixturesPage() {
   );
   const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
   const [currentMonthIndex, setCurrentMonthIndex] = useState<number>(() => new Date().getMonth());
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 8;
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
 
   const filteredEvents = useMemo(
     () => events.filter((e) => filters[e.calKey]),
@@ -85,34 +86,72 @@ export default function FixturesPage() {
     return grouped;
   }, [filteredEvents]);
 
+  const currentMonthEvents = eventsByMonth[currentMonthIndex] || [];
+  const totalPages = Math.ceil(currentMonthEvents.length / eventsPerPage);
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = currentMonthEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+
+   const isAllSelected = useMemo(
+    () => Object.values(filters).every(Boolean),
+    [filters]
+  );
+  
   function prevMonth() {
     setCurrentMonthIndex((i) => (i === 0 ? 11 : i - 1));
+    setCurrentPage(1);
     setSelectedEvent(null);
   }
 
   function nextMonth() {
     setCurrentMonthIndex((i) => (i === 11 ? 0 : i + 1));
+    setCurrentPage(1);
     setSelectedEvent(null);
   }
 
   function toggleFilter(key: string) {
     setFilters((f) => ({ ...f, [key]: !f[key] }));
+    setCurrentPage(1);
+  }
+
+  function toggleAllFilters(e: React.ChangeEvent<HTMLInputElement>) {
+    const isChecked = e.target.checked;
+    const newFilters = filterOptions.reduce(
+      (acc, f) => ({ ...acc, [f.key]: isChecked }),
+      {}
+    );
+    setFilters(newFilters);
+    setCurrentPage(1);
+  }
+ 
+  function paginate(pageNumber: number) {
+    setCurrentPage(pageNumber);
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="flex flex-col md:flex-row w-full">
       <SEO
         title="Fixtures – Maidenhead Town Bowls Club"
         description="Displays this season's fixture list"
       />
       {/* Filter panel */}
       <div
-        className={`fixed z-30 top-0 left-0 h-full w-64 bg-white border-r border-gray-300 transition-transform duration-300 ease-in-out
-          ${isFiltersOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
+        className={`fixed z-30 top-0 left-0 h-full w-64 py-16 bg-white border-r border-gray-300 transition-transform duration-300 ease-in-out
+          ${isFiltersOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="p-4 h-full flex flex-col">
+
+        <div className="p-4 md:pt-16 h-full flex flex-col">
           <h2 className="font-bold mb-4 text-xl">Filters</h2>
+          {/* New "All" checkbox */}
+          <label className="block mb-2 cursor-pointer select-none text-base font-bold">
+            <input
+              type="checkbox"
+              checked={isAllSelected}
+              onChange={toggleAllFilters}
+              className="mr-2"
+            />
+            All
+          </label>
           {filterOptions.map(({ key, label }) => (
             <label key={key} className="block mb-2 cursor-pointer select-none text-base">
               <input
@@ -146,65 +185,94 @@ export default function FixturesPage() {
         </button>
       )}
 
-      {/* Main content */}
-      <div className="flex-1 relative overflow-hidden p-2 ml-14">
-        {/* Month selector container fixed at 50% of list width */}
-        <div className="w-1/3 ml-4 relative h-10 mb-4">
-          <button
-            onClick={prevMonth}
-            className="absolute left-0 top-0 h-10 px-3 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
-          >
-            &lt;
-          </button>
+      {/* Main content with flex-1 restored */}
+      <div className="flex-1">
+        <div className="p-4 md:p-8 bg-white/70 rounded-md shadow-lg mx-4 md:mx-8">
+          {/* New wrapper for the month row to isolate it */}
+          <div className="w-full max-w-lg mx-auto">
+            <div className="grid grid-cols-[auto_1fr_auto] gap-1 items-center h-10 mb-4">
+              <button
+                onClick={prevMonth}
+                className="h-10 px-3 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
+              >
+                &lt;
+              </button>
 
-          <div className="absolute left-0 right-0 top-0 h-10 flex items-center justify-center">
-            <h1 className="text-2xl font-bold text-center">
-              {monthNames[currentMonthIndex]}
-            </h1>
+              <h1 className="text-2xl font-bold text-center">
+                {monthNames[currentMonthIndex]}
+              </h1>
+
+              <button
+                onClick={nextMonth}
+                className="h-10 px-3 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
+              >
+                &gt;
+              </button>
+            </div>
           </div>
 
-          <button
-            onClick={nextMonth}
-            className="absolute right-0 top-0 h-10 px-3 bg-gray-200 rounded hover:bg-gray-300 text-lg font-bold select-none"
-          >
-            &gt;
-          </button>
-        </div>
-
-        {/* Fixture list in 2/3 width grey rectangle closer to left edge */}
-        <div className="flex justify-start">
-          <div className="bg-gray-100 rounded-2xl p-4 shadow-md w-2/3 ml-4">
+          {/* Fixture list */}
+          <div className="bg-gray-100 rounded-2xl p-4 shadow-md w-full">
             <ul className="space-y-1">
-              {(eventsByMonth[currentMonthIndex] || []).map((e) => {
-                const date = new Date(e.reqJDate);
-                const day = date.getDate();
-                const month = monthNames[e.reqMonth];
-                const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
-                const color = filterOptions.find(f => f.key === e.calKey)?.color || ["128", "128", "128"];
-                const rgb = `rgb(${color.join(",")})`;
-                const endTime = calculateEndTime(e.startTime, e.duration || 2);
+              {currentEvents.length > 0 ? (
+                currentEvents.map((e) => {
+                  const color = filterOptions.find(f => f.key === e.calKey)?.color || ["128", "128", "128"];
+                  const rgb = `rgb(${color.join(",")})`;
+                  const endTime = calculateEndTime(e.startTime, e.duration || 2);
 
-                return (
-                  <li
-                    key={e.eventId}
-                    onClick={() => setSelectedEvent(e)}
-                    className="cursor-pointer px-4 py-1 rounded-md hover:bg-gray-200 flex items-center gap-4"
-                  >
-                    <div className="w-10 text-xl text-gray-800">{e.reqDate}</div>
-                    <div className="w-20 text-base text-gray-700">{month}</div>
-                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: rgb }} />
-                    <div className="text-base text-gray-800">
-                      {e.startTime} – {endTime} 
-                    </div>
-                    <div className="w-20 text-base text-gray-700">
-                      {e.homeAway === "H" ? "Home" : "Away"} 
-                    </div>
-                    <div className="text-base text-gray-700">{e.subject}</div>
-                  </li>
-                );
-              })}
+                  return (
+                    <li
+                      key={e.eventId}
+                      onClick={() => setSelectedEvent(e)}
+                      className="cursor-pointer px-4 py-1 rounded-md hover:bg-gray-200 flex items-center gap-4"
+                    >
+                      <div className="w-10 text-xl text-gray-800">{e.reqDate}</div>
+                      <div className="w-20 text-base text-gray-700">{monthNames[e.reqMonth]}</div>
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: rgb }} />
+                      <div className="text-base text-gray-800">
+                        {e.startTime} – {endTime}
+                      </div>
+                      <div className="w-20 text-base text-gray-700">
+                        {e.homeAway === "H" ? "Home" : "Away"}
+                      </div>
+                      <div className="text-base text-gray-700">{e.subject}</div>
+                    </li>
+                  );
+                })
+              ) : (
+                <p className="text-center text-gray-500">No events found for this month.</p>
+              )}
             </ul>
           </div>
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-4">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => paginate(page)}
+                    className={`px-3 py-1 rounded ${currentPage === page ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                  >
+                    {page}
+                  </button>
+              ))}
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

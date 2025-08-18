@@ -232,7 +232,7 @@ function validateMember(member: MemberRecord | null | undefined): ValidationResu
             />
           ) : null
         }
-      /> // PageLayout
+      /> // MaintainPageLayout
     </>
   );
 };

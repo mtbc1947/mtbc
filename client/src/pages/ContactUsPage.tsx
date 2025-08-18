@@ -77,8 +77,8 @@ const ContactUsPage: React.FC = () => {
         description="Provides Contact details and Contact form."
       />
       {/* Left Column */}
-      <div className="w-full md:w-1/2 bg-amber-200 flex items-center justify-center p-6">
-        <div className="max-w-md w-full space-y-5 text-lg text-left text-black">
+      <div className="w-full md:w-1/2 flex justify-center h-full px-4 bg-white/70 rounded-md shadow-lg my-6 mx-4 md:mx-8">
+        <div className="max-w-2xl w-full space-y-4 text-lg text-left p-4 text-black">
           <p className="font-semibold">
             You may contact us in a way that suits you: by calling the club directly using a phone number below,
             or you can directly contact one of the people shown. Alternatively, you may send an email using the
@@ -91,7 +91,7 @@ const ContactUsPage: React.FC = () => {
 
           <table className="w-full border border-black text-sm">
             <thead>
-              <tr className="bg-amber-300 border-b border-black">
+              <tr className="bg-white/70 border-b border-black">
                 <th className="border-r border-black px-2 py-1 text-center">Name</th>
                 <th className="px-2 py-1 text-left">Phone</th>
               </tr>
@@ -125,10 +125,10 @@ const ContactUsPage: React.FC = () => {
       </div>
 
       {/* Right Column with Form */}
-      <div className="w-full md:w-1/2 bg-blue-300 flex justify-center items-start p-6 md:p-12 pt-12 md:pt-16">
+      <div className="w-full md:w-1/2 flex justify-center h-full px-4 bg-black/70 rounded-md shadow-lg mx-4 md:mx-8">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-xl p-8 bg-gray-500 rounded-2xl shadow-md"
+          className="w-full max-w-xl p-8"
         >
           <h2 className="text-2xl font-semibold text-center text-white mb-6">
             Contact Us

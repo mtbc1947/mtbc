@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import { SEO } from 'components';
 import { getRefDataValuesByPage } from 'utilities';
 
-import  clubFront  from 'assets/club_front.jpg';
-import club from '../assets/match1.jpg';
+import club from '../assets/match1.jpg'; // Keep this import for the image within the content
 
 const AboutUsPage: React.FC = () => {
   const wYear = new Date().getFullYear();
@@ -30,10 +29,7 @@ const AboutUsPage: React.FC = () => {
   const wMatchFee = strings[5] ?? "";
 
   return (
-    <div
-      className="bg-cover bg-center min-h-screen py-2 px-25 md:p-16 text-black font-sans"
-      style={{ backgroundImage: `url(${clubFront})` }}
-    >
+    <div className="py-2 px-4 md:p-16 text-black font-sans">
       <SEO
         title="About Us – Maidenhead Town Bowls Club"
         description="Some background information about our bowls club."

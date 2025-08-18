@@ -64,12 +64,12 @@ const TeamPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4">
+    <div className="flex flex-col items-center justify-center p-1 ">
       <SEO
         title="TeamPage – Maidenhead Town Bowls Club"
         description="Shows the results for a club team"
       />
-      <h2 className="text-3xl font-bold my-4">{wTitle}</h2>
+      <h2 className="text-3xl font-bold my-2">{wTitle}</h2>
 
       {league === "rs" ? (
         <p className="text-center text-2xl max-w-xl">
@@ -82,11 +82,9 @@ const TeamPage: React.FC = () => {
         <iframe
           title={wTitle}
           src={sheetUrl}
-          width="75%"
-          height="600px"
-          style={{ border: "1px solid #ccc" }}
-          frameBorder="0"
-          scrolling="yes"
+          width="85%"
+          height="450px"
+          style={{ border: "4px solid #ccc" }}
         />
       ) : (
         <p className="text-center">No data available for this team.</p>
