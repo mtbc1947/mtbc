@@ -26,7 +26,6 @@ const AboutUsPage: React.FC = () => {
   const wSocialFee = strings[2] ?? "";
   const wRollUpFee = strings[3] ?? "";
   const wCompFee = strings[4] ?? "";
-  const wMatchFee = strings[5] ?? "";
 
   return (
     <div className="py-2 px-4 md:p-16 text-black font-sans">
@@ -74,8 +73,8 @@ const AboutUsPage: React.FC = () => {
         <p className="mb-2">Our Full Membership Fee for {wYear} is £{wFullFee} with {wJoiningFee}, the Social Membership fee for {wYear} is £{wSocialFee}.</p>
         <p className="mb-2">Use of the green for Roll Ups and Club Competitions are {wRollUpFee}.</p>
         <p className="mb-2">There is a fee of £{wCompFee} for each Club Competition entered.</p>
-        <p className="mb-2">There is a match fee of £{wMatchFee} for interclub matches to cover the cost of the snack provided at the end of the game. If a meal is provided the charge may be higher.</p>
 
+        {/* this was requested as change 4 on 22/8/25 by TE & TS
         <h2 className="text-xl font-bold mt-8 mb-2">SOCIAL EVENTS</h2>
         <p className="mb-4">
           As well as the competitive side of the club, we also pride ourselves
@@ -83,6 +82,7 @@ const AboutUsPage: React.FC = () => {
           encourage this aspect.{" "}
           <Link to="/social" className="text-blue-700 underline">Click here</Link> for more details of these events.
         </p>
+        */}
 
         <h2 className="text-xl font-bold mt-8 mb-2">DATA PRIVACY</h2>
         <p className="mb-4">
@@ -98,7 +98,8 @@ const AboutUsPage: React.FC = () => {
           chat first, please use the <Link to="/contactUs" className="text-blue-700 underline">Contact Form</Link> to get someone to contact
           you or email the club <a href="mailto:maidenheadtownbc@gmail.com" className="text-blue-700 underline">maidenheadtownbc@gmail.com</a>
         </p>
-
+        
+        {/* this was requested as change 5 on 22/8/25 by TE & TS
         <div className="mt-6 flex justify-center">
           <img
             src={club}
@@ -106,6 +107,7 @@ const AboutUsPage: React.FC = () => {
             className="rounded shadow-md max-w-xs md:max-w-md w-full"
           />
         </div>
+        */}
       </div>
     </div>
   );

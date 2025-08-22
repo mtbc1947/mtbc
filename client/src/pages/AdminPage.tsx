@@ -140,7 +140,8 @@ const AdminPage: React.FC = () => {
           >
             Maintain Member
           </Link>
-
+          
+          {/* change 6 on ChangeControl List 22/8/25
           <Link
             to="/maintainCommittee"
             state={{ skipAuth: true, adminName }}
@@ -156,7 +157,8 @@ const AdminPage: React.FC = () => {
           >
             Maintain Officer
           </Link>
-
+          */}
+          
           <button
             onClick={logout}
             className="block bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"

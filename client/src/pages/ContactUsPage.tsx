@@ -109,8 +109,7 @@ const ContactUsPage: React.FC = () => {
           </table>
 
           <p className="text-lg">
-            For friendly match enquiries, please contact one of the Club Captains shown on the{' '}
-            <Link to="/officers" className="underline text-blue-900 hover:text-blue-700">Officers page</Link>.
+            For friendly match enquiries, please contact one of the Club Captains.
           </p>
           <p className="text-lg">
             Or email us any time —{' '}

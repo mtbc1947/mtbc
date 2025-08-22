@@ -11,12 +11,10 @@ const menuGroup1: MenuGroupIf[] = [
     items: [
       { label: "Home", to: "/" },
       { label: "About Us", to: "/aboutUs" },
-      { label: "History", to: "/history" },
-      { label: "Officers", to: "/officers" },
     ],
   },
   {
-    label: "Teams",
+    label: "Leagues",
     key: "teams",
     items: [
       { label: "Kennet A", to: "/team/kl/A" },
@@ -26,16 +24,8 @@ const menuGroup1: MenuGroupIf[] = [
       { label: "KLV C", to: "/team/klv/C" },
       { label: "KLV D", to: "/team/klv/D" },
       { label: "Royal Shield", to: "/team/rs/A" },
-      { label: "TV Ash", to: "/team/tv/A" },
-      { label: "TV Beech", to: "/team/tv/B" },
-    ],
-  },
-  {
-    label: "News",
-    key: "news",
-    items: [
-      { label: "Notice Board", to: "/noticeboard" },
-      { label: "News Reports", to: "/newsReports" },
+      { label: "TVL Ash", to: "/team/tv/A" },
+      { label: "TVL Beech", to: "/team/tv/B" },
     ],
   },
 ];
@@ -45,8 +35,6 @@ const menuGroup2: MenuGroupIf[] = [
     label: "More",
     key: "more",
     items: [
-      { label: "County Presidents", to: "/countyPresidents" },
-      { label: "Presidents", to: "/presidents" },
       { label: "Admin", to: "/admin" },
     ],
   },
@@ -87,11 +75,11 @@ const Navbar: React.FC = () => {
         </Link>
 
         <div className="flex flex-col justify-center w-full">
-          <h1 className="text-xl md:text-2xl font-bold leading-tight">Maidenhead Town</h1>
+          <h1 className="text-xl md:text-3xl font-bold leading-tight">Maidenhead Town</h1>
 
           {/* Desktop Navigation */}
           <nav
-            className="hidden md:flex flex-wrap gap-1 tb:gap-8 lg:gap-12 xl:gap-20 text-base text-black font-medium mt-1 relative z-50"
+            className="hidden md:flex flex-wrap gap-1 tb:gap-8 lg:gap-12 xl:gap-20 text-2xl text-black font-medium mt-1 relative z-50"
             role="menubar"
           >
             {menuGroup1.map((menu, idx) => (

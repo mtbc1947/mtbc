@@ -86,7 +86,7 @@ const HomePage: React.FC = () => {
           </motion.div>
         )}
         {/* Text Content */}
-        <article className="flex-1 text-black text-[18px] leading-relaxed">
+        <article className="flex-1 text-black  text-[20px] leading-relaxed">
           <p>
             Maidenhead Town Bowls Club is situated in quiet parkland in Oaken Grove Park,
             with the benefit of ample free parking. We are a friendly, sociable club,
