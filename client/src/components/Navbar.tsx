@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
 
             {/* Non-dropdown links */}
             {["/fixtures", "/booking", "/location", "/contactUs"].map((to, idx) => {
-              const labels = ["Fixtures", "Booking", "Location", "Contact"];
+              const labels = ["Fixtures", "BowlR", "Location", "Contact"];
               const refIndex = menuGroup1.length + idx;
               return (
                 <Link
@@ -154,7 +154,7 @@ const Navbar: React.FC = () => {
           ))}
 
           {["/fixtures", "/booking", "/location", "/contactUs"].map((to, idx) => {
-            const labels = ["Fixtures", "Booking", "Location", "Contact"];
+            const labels = ["Fixtures", "BowlR", "Location", "Contact"];
             return (
               <Link
                 key={to}

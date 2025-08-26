@@ -119,7 +119,7 @@ const HomePage: React.FC = () => {
             />
           </div>
           <p>
-            The greens are open from {wOpenHours}, {wOpenDays}, until dusk,
+            The green is open from {wOpenHours}, {wOpenDays}, until dusk,
             and Members are welcome to come along for a roll-up and use the
             Green whenever it is available, with {wGreenFees}.
           </p>

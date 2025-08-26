@@ -10,7 +10,7 @@ type Contact = {
 const contacts: Contact[] = [
   { name: 'Maidenhead Town', phone: '01628-675-911' },
   { name: 'Lesley Monaghan (Club Secretary)', phone: '07848-919-010' },
-  { name: "Kim Eales (Ladies' Captain)", phone: '07887-848-4472' },
+  { name: "Kim Eales (Ladies' Captain)", phone: '07887-848-447' },
   { name: "Tim Eales (Men's Captain)", phone: '07766-130-664' },
 ];
 

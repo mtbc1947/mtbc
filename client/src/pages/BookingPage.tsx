@@ -13,12 +13,12 @@ const BookingPage: React.FC = () => {
       <div className="bg-white/70 rounded-2xl shadow-md p-10 text-center flex flex-col items-center w-auto">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">Link to BowlR</h1>
         <a
-          href="https://bowlrbc.co.uk/club-booking-2/"
+          href="/"
           target="_blank"
           rel="noopener noreferrer"
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full inline-block"
         >
-          Book Now
+          Home
         </a>
       </div>
     </div>
