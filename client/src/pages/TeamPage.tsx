@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import SEO from '../components/SEO';
 
@@ -62,6 +63,13 @@ const TeamPage: React.FC = () => {
       sheetUrl = "";
       break;
   }
+  /**
+  if (sheetUrl) {
+    useEffect(() => {
+      window.open(sheetUrl, "_blank", "noopener,noreferrer");
+    }, [sheetUrl]);
+  }
+  */
 
   return (
     <div className="flex flex-col items-center justify-center p-1 ">
@@ -82,8 +90,8 @@ const TeamPage: React.FC = () => {
         <iframe
           title={wTitle}
           src={sheetUrl}
-          width="85%"
-          height="450px"
+          width="100%"
+          height="665px"
           style={{ border: "4px solid #ccc" }}
         />
       ) : (

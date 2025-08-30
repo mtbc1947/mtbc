@@ -22,3 +22,6 @@ npm-debug.log*
 # IDEs and OS
 .vscode/
 .DS_Store
+
+# Other
+backend/tmp
