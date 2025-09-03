@@ -6,25 +6,39 @@ services:
   repo: https://github.com/allentrev/mtbc3
   plan: free
   envVars:
+  - key: MONGO_URI
+    sync: false
+  - key: POSTMAN1
+    sync: false
+  - key: IK_PUBLIC_KEY
+    sync: false
+  - key: IK_PRIVATE_KEY
+    sync: false
+  - key: IK_URL_ENDPOINT
+    sync: false
+  - key: MJ_APIKEY_PRIVATE
+    sync: false
+  - key: MJ_APIKEY_PUBLIC
+    sync: false
+  - key: PORT
+    sync: false
   - key: CLIENT_URL
     sync: false
   - key: NODE_ENV
     sync: false
-  - key: MONGO_URI
+  - key: SMTP_HOST
     sync: false
-  - key: IK_URL_ENDPOINT
+  - key: SMTP_PORT
     sync: false
-  - key: PORT
+  - key: SMTP_SECURE
     sync: false
-  - key: MJ_APIKEY_PUBLIC
+  - key: SMTP_USER
     sync: false
-  - key: MJ_APIKEY_PRIVATE
+  - key: SMTP_PASS
     sync: false
-  - key: IK_PRIVATE_KEY
+  - key: SMTP_FROM
     sync: false
-  - key: IK_PUBLIC_KEY
-    sync: false
-  - key: POSTMAN1
+  - key: SMTP_TO
     sync: false
   region: oregon
   buildCommand: npm install && npm run render-build
