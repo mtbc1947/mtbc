@@ -1,21 +1,50 @@
+# Exported from Render on 2025-09-03T10:14:48Z
 services:
-  - type: web
-    name: mtbc3-backend
-    env: node
-    plan: free
-    buildCommand: npm install
-    startCommand: npm start
-    rootDir: backend
-    envVars:
-      - key: PORT
-        value: 5000
+- type: web
+  name: mtbc
+  runtime: node
+  repo: https://github.com/allentrev/mtbc3
+  plan: free
+  envVars:
+  - key: CLIENT_URL
+    sync: false
+  - key: NODE_ENV
+    sync: false
+  - key: MONGO_URI
+    sync: false
+  - key: IK_URL_ENDPOINT
+    sync: false
+  - key: PORT
+    sync: false
+  - key: MJ_APIKEY_PUBLIC
+    sync: false
+  - key: MJ_APIKEY_PRIVATE
+    sync: false
+  - key: IK_PRIVATE_KEY
+    sync: false
+  - key: IK_PUBLIC_KEY
+    sync: false
+  - key: POSTMAN1
+    sync: false
+  region: oregon
+  buildCommand: npm install && npm run render-build
+  startCommand: npm start
+  healthCheckPath: /health
+  autoDeployTrigger: commit
+  rootDir: ./backend
 
-  - type: web
-    runtime: static
-    name: mtbc3-frontend
-    rootDir: client
-    buildCommand: npm install && npm run build
-    staticPublishPath: build
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://mtbc3-backend.onrender.com
+- type: web
+  name: mtbc3
+  runtime: static
+  repo: https://github.com/allentrev/mtbc3
+  envVars:
+  - key: VITE_BACKEND_URL
+    sync: false
+  buildCommand: npm run build
+  staticPublishPath: dist
+  domains:
+  - www.oursingapore.co.uk
+  - oursingapore.co.uk
+  autoDeployTrigger: commit
+  rootDir: ./client
+version: "1"
