@@ -1,9 +1,9 @@
 # Exported from Render on 2025-09-03T10:14:48Z
 services:
 - type: web
-  name: mtbc
+  name: mtbc-backend
   runtime: node
-  repo: https://github.com/allentrev/mtbc3
+  repo: https://github.com/mtbc1947/mtbc
   plan: free
   envVars:
   - key: MONGO_URI
@@ -48,9 +48,9 @@ services:
   rootDir: ./backend
 
 - type: web
-  name: mtbc3
+  name: mtbc-frontend
   runtime: static
-  repo: https://github.com/allentrev/mtbc3
+  repo: https://github.com/mtbc1947/mtbc
   envVars:
   - key: VITE_BACKEND_URL
     sync: false
