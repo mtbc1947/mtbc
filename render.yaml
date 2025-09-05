@@ -56,9 +56,6 @@ services:
     sync: false
   buildCommand: npm run build
   staticPublishPath: dist
-  domains:
-  - www.oursingapore.co.uk
-  - oursingapore.co.uk
   autoDeployTrigger: commit
   rootDir: ./client
 version: "1"
