@@ -24,6 +24,6 @@ const refDataSchema = new Schema<RefDataDocument>(
     { timestamps: true }
 );
 
-const RefData = mongoose.model<RefDataDocument>("RefData", refDataSchema);
+const RefData = mongoose.model<RefDataDocument>("Refdata", refDataSchema);
 
 export default RefData;

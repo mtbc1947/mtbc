@@ -11,6 +11,7 @@ const menuGroup1: MenuGroupIf[] = [
     items: [
       { label: "Home", to: "/" },
       { label: "About Us", to: "/aboutUs" },
+      { label: "Open", to: "/openDay" },
     ],
   },
   {

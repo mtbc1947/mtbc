@@ -2,5 +2,14 @@
     "typescript.tsdk": "client/node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true,
     "typescript.tsserver.projectRoot": "client",
-    "liveServer.settings.multiRootWorkspaceName": "mtbc3"
+    "liveServer.settings.multiRootWorkspaceName": "mtbc3",
+
+    // Tailwind CSS IntelliSense settings
+    "tailwindCSS.includeLanguages": {
+        "typescript": "javascript",
+        "typescriptreact": "javascript"
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    }
 }
