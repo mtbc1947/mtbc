@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc --project tsconfig.json",
+    "build": "rm -rf dist && tsc --project tsconfig.json",
     "render-build": "npm run build",
+    "predev": "fuser -k 4000/tcp || true",
     "dev": "nodemon --watch './**/*.ts' --exec tsx index.ts"
   },
   "keywords": [],

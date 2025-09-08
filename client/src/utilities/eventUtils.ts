@@ -129,6 +129,7 @@ export const updateEvent = async (event: EventRecord): Promise<EventRecord> => {
 
 export async function importEvents(file: File): Promise<{ inserted: number }> {
     console.log("util/importEvents");
+    console.log(file);
 
     const url = `${import.meta.env.VITE_BACKEND_URL}/event/import`;
 

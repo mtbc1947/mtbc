@@ -1,0 +1,183 @@
+DiM,Game_Event,Rinks,Type,H_A,Time,Dress
+month=Apr,,,,,,
+5,Subscription Day,,,Home,14:30, 
+15,Green Open,,,Home,10:00,
+26,General Sale,,,Home,10:00,
+27,Opening Day Match,6,,Home,14:00,W
+29,Kennet B Team,4,KL,Away,18:00,
+29,Kennet A Team,4,KL,Home,18:00,
+month=May,,,,,,
+1,KLV D Team,3,KLV,Away,13:45,
+2,KLV B Team,3,KLV,Away,13:45,
+2,KLV C Team,3,KLV,Away,13:45,
+2,KLV A Team,3,KLV,Home,13:45,
+3,Henley,4MT,F,Away,14:30,G
+4,Burghfield,4MT,F,Away,14:30,W
+6,Kennet B Team,4,KL,Home,18:00,
+6,Kennet A Team,4,KL,Away,18:00,
+8,TVLL A Team,3,TV,Away,14:30,
+8,TVLL B Team,3,TV,Away,14:30,
+9,KLV D Team,3,KLV,Away,13:45,
+9,KLV C Team,3,KLV,Away,13:45,
+9,KLV B Team,3,KLV,Home,13:45,
+9,KLV A Team,3,KLV,Home,13:45,
+13,Kennet A Team,4,KL,Home,18:00,
+13,Kennet B Team,4,KL,Away,18:00,
+13,Desborough,4MT,F,Home,14:00,G
+15,TVLL A Team,3,TV,Home,14:00,
+15,TVLL B Team,3,TV,Home,14:30,
+16,KLV D Team,3,KLV,Home,13:45,
+16,KLV A Team,3,KLV,Away,13:45,
+16,KLV C Team,3,KLV,Away,13:45,
+16,KLV B Team,3,KLV,Home,13:45,
+17,New Members Open Day,6,,Home,10:00, 
+18,Iver Heath,4MT,F,Home,14:00,W
+20,Kennet B Team,4,KL,Home,18:00,
+20,Kennet A Team,4,KL,Away,18:00,
+21,Berks Ladies v Beds,6,L,Home,13:30, 
+22,TVLL B Team,3,TV,Away,14:00,
+22,TVLL A Team,3,TV,Home,14:00,
+23,KLV D Team,3,KLV,Away,13:45,
+23,KLV C Team,3,KLV,Home,13:45,
+23,KLV A Team,3,KLV,Home,13:45,
+23,KLV B Team,3,KLV,Away,13:45,
+24,Windsor & Eton,4MT,F,Away,14:30,G
+27,Royal Shield,3,RS,Away,14:00,
+27,Kennet A Team,4,KL,Away,18:00,
+27,Kennet B Team,4,KL,Away,18:00,
+28,Flackwell Heath,4MT,F,Home,18:00,W
+29,TVLL A Team,3,TV,Away,14:00,
+29,TVLL B Team,3,TV,Away,14:00,
+30,KLV D Team,3,KLV,Home,13:45,
+30,KLV A Team,3,KLV,Away,13:45,
+30,KLV B Team,3,KLV,Home,13:45,
+30,KLV C Team,3,KLV,Away,13:45,
+31,Hurst,4MT,F,Away,14:30,G
+month=Jun,,,,,,
+1,New Members Open Day,6,,Home,10:00, 
+3,Kennet B Team,4,KL,Away,18:15,
+3,Kennet A Team,4,KL,Home,18:15,
+5,TVLL B Team,3,TV,Home,14:00,
+5,TVLL A Team,3,TV,Home,14:00,
+5,KLV C Team,3,KLV,Away,10:30,
+6,KLV A Team,3,KLV,Away,13:45,
+6,KLV B Team,3,KLV,Home,13:45,
+6,KLV D Team,3,KLV,Home,13:45,
+7,Marlow,4MT,F,Home,14:00,W
+10,Desborough,4MT,F,Away,14:00,W
+10,Kennet B Team,4,KL,Away,18:15,
+10,Royal Shield,3,RS,Away,14:30,
+10,Kennet A Team,4,KL,Home,18:15,
+12,TVLL A Team,3,TV,Away,14:30,
+12,TVLL B Team,3,TV,Away,14:00,
+13,KLV D Team,3,KLV,Home,13:45,
+13,KLV B Team,3,KLV,Away,13:45,
+13,KLV A Team,3,KLV,Away,13:45,
+13,KLV C Team,3,KLV,Home,13:45,
+14,Reading,4MT,F,Home,14:00,G
+17,KLV C Team,3,KLV,Home,13:45,
+17,Kennet A Team,4,KL,Away,18:15,
+17,Kennet B Team,4,KL,Home,18:15,
+17,Royal Shield,3,RS,Home,14:30,
+18,KLV C Team,3,KLV,Home,10:00,
+18,Hurst,4MT,F,Home,18:30,W
+19,TVLL B Team,3,TV,Away,14:30,
+19,TVLL A Team,3,TV,Away,14:00,
+19,Essex v Glouc,6,L,Home,13:00, 
+20,KLV B Team,3,KLV,Home,13:45,
+20,KLV D Team,3,KLV,Home,13:45,
+20,KLV A Team,3,KLV,Away,13:45,
+22,Windsor Great Park,4MT,F,Home,14:00,G
+24,Kennet A Team,4,KL,Home,18:15,
+24,Kennet B Team,4,KL,Away,18:15,
+24,Royal Shield,3,RS,Away,14:30,
+26,TVLL B Team,3,TV,Home,14:30,
+26,TVLL A Team,3,TV,Home,14:30,
+27,KLV C Team,3,KLV,Home,13:45,
+27,KLV B Team,3,KLV,Away,13:45,
+27,KLV D Team,3,KLV,Home,13:45,
+27,KLV A Team,3,KLV,Away,13:45,
+28,Henley,4MT,F,Home,14:00,W
+month=Jul,,,,,,
+1,Bracknell,4MT,F,Away,14:00,G
+1,Kennet A Team,4,KL,Away,18:15,
+1,Kennet B Team,4,KL,Home,18:15,
+3,TVLL B Team,3,TV,Away,14:30,
+3,TVLL A Team,3,TV,Away,14:00,
+4,KLV D Team,3,KLV,Away,13:45,
+4,KLV B Team,3,KLV,Away,13:45,
+4,KLV C Team,3,KLV,Home,13:45,
+4,KLV A Team,3,KLV,Home,13:45,
+5,Burghfield,4MT,F,Home,14:00,W
+8,Kennet B Team,4,KL,Away,18:15,
+8,Kennet A Team,4,KL,Home,18:15,
+8,Marlow,4MT,F,Home,14:00,G
+8,Royal Shield,3,RS,Away,14:30,
+10,TVLL A Team,3,TV,Away,14:00,
+10,TVLL B Team,3,TV,Home,14:00,
+11,KLV B Team,3,KLV,Home,13:45,
+11,KLV C Team,3,KLV,Away,13:45,
+11,KLV D Team,3,KLV,Away,13:45,
+11,KLV A Team,3,KLV,Away,13:45,
+13,Suttons,4MT,F,Away,14:30,W
+15,Royal Shield,3,RS,Home,14:30,
+15,Great Hollands,3LT,F,Home,14:00,W
+15,Kennet B Team,4,KL,Away,18:15,
+15,Kennet A Team,4,KL,Home,18:15,
+17,TVLL B Team,3,TV,Home,14:00,
+17,TVLL A Team,3,TV,Home,14:00,
+17,KLV D Team,3,KLV,Away,13:45,
+18,KLV A Team,3,KLV,Home,13:45,
+18,KLV C Team,3,KLV,Home,13:45,
+18,KLV B Team,3,KLV,Away,13:45,
+20,Palmer Park,4MT,F,Home,14:00,G
+22,Kennet B Team,4,KL,Home,18:15,
+22,Royal Shield,3,RS,Home,14:30,
+22,Kennet A Team,4,KL,Away,18:15,
+24,KLV B Team,3,KLV,Away,13:45,
+24,TVLL A Team,3,TV,Away,14:00,
+24,TVLL B Team,3,TV,Away,14:00,
+25,KLV C Team,3,KLV,Home,13:45,
+25,KLV A Team,3,KLV,Home,13:45,
+25,KLV D Team,3,KLV,Away,13:45,
+26,High Wycombe,4MT,F,Away,14:00,W
+27,Triangular Trophy,6,,Away,09:00,W
+29,Kennet A Team,4,KL,Away,18:15,
+29,Reading,4MT,F,Away,14:30,G
+29,Kennet B Team,4,KL,Home,18:15,
+30,Palmer Park,4MT,F,Away,18:00,G
+31,TVLL B Team,3,TV,Home,14:00,
+31,TVLL A Team,3,TV,Home,14:30,
+month=Aug,,,,,,
+1,KLV B Team,3,KLV,Home,13:45,
+1,KLV D Team,3,KLV,Away,13:45,
+1,KLV C Team,3,KLV,Away,13:45,
+1,KLV A Team,3,KLV,Home,13:45,
+2,4 Team Tournament,6,,Home,10:00,W
+5,Royal Shield,3,RS,Home,14:30,
+5,Kennet B Team,4,KL,Away,18:00,
+6,Marlow,4MT,F,Away,14:00,W
+7,TVLL A Team,3,TV,Home,14:00,
+7,TVLL B Team,3,TV,Home,14:30,
+8,KLV D Team,3,KLV,Home,13:45,
+9,High Wycombe,4MT,F,Home,14:00,W
+10,Mixed Triples,4MT,,Home,12:00,W
+12,Royal Shield,3,RS,Home,14:00,
+16,Flackwell Heath,4MT,F,Away,14:00,G
+19,GIANT PAN,6,,Home,18:00,
+20,Twyford,4MT,F,Away,18:00,W
+23,Wargrave,4MT,F,Away,14:30,G
+26,Royal Shield,3,RS,Away,14:30,
+28,Hot Dog Tropy,3MT,,Home,18:00,W
+28,Cream Tea Trophy,6,,Home,14:00,W
+30,SPIT ROAST AND BOWLS,,,Home,13:30, 
+31,Captains V President,6,,Home,14:00,W
+month=Sep ,,,,,,
+2,Hot Dog Tropy,6,,Away,18:00,W
+2,Cream Tea Trophy,6,,Away,14:00,W
+6,Club Finals,6,,Home,10:00,W
+7,Club Finals,6,,Home,10:00,W
+9,Essex v Wiltshire,6,L,Home,13:00,G
+13,Burnham,4MT,F,Away,14:30,W
+14,2 Wood Competition,4MT,,Home,10:00,W
+22,AGM,,,Home,14:00, 

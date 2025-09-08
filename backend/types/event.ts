@@ -14,7 +14,7 @@ export interface EventDocument extends Document {
     dress: string;
     mix: string;
     duration: number;
-    rinks: number;
+    rinks: string;
     eventType: string;
     useType: string;
     gameType: string;

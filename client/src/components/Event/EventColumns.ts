@@ -23,7 +23,7 @@ export function getEventColumns(): ColumnDescriptor<EventRecord>[] {
             key: "homeAway",
             label: "Venue",
             align: "center",
-            render: (_, item) => (item.homeAway === "H`" ? "Home" : "Away"),
+            render: (_, item) => (item.homeAway === "H" ? "Home" : "Away"),
             optional: false,
         },
         {
