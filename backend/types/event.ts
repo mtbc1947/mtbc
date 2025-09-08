@@ -11,15 +11,15 @@ export interface EventDocument extends Document {
     startTime: string;
     severity: string;
     homeAway: string;
-    dress: string;
-    mix: string;
+    dress?: string | null;
+    mix?: string | null;
     duration: number;
-    rinks: string;
+    rinks?: string | null;
     eventType: string;
-    useType: string;
-    gameType: string;
-    league?: string;
-    division?: string;
-    team?: string;
+    useType?: string | null;
+    gameType?: string | null;
+    league?: string | null;
+    division?: string | null;
+    team?: string | null;
     calKey: string;
 }

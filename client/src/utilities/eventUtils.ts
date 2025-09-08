@@ -25,7 +25,7 @@ export interface EventRecord {
     rinks: number;
     eventType: string;
     useType: string;
-    gameType: string;
+    gameType: string | null;
     league: string;
     division: string;
     team: string;

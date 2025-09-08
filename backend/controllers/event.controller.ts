@@ -39,6 +39,28 @@ export async function emailFile({
     console.log("Mailjet email sent:", info.messageId);
 }
 
+// Utility: normalize optional fields "" → null
+function convertToNull<T extends Record<string, any>>(data: T): T {
+  const optionalFields: (keyof T)[] = [
+    "mix",
+    "dress",
+    "rinks",
+    "gameType",
+    "league",
+    "division",
+    "team",
+    "useType",
+  ] as (keyof T)[];
+
+  for (const field of optionalFields) {
+    if (data[field] !== undefined && (data[field] === "" || data[field] === null)) {
+      data[field] = null as any; 
+    }
+  }
+
+  return data;
+}
+
 export const getEvents = async (req: Request, res: Response): Promise<void> => {
     console.log("event.controller, getEvents");
     try {
@@ -60,10 +82,9 @@ export const createEvent = async (
     try {
         const eventId = `EVT-${uuidv4()}`;
 
-        const newEvent = new Event({
-            ...req.body,
-            eventId,
-        });
+        const normalized = convertToNull({ ...req.body, eventId });
+
+        const newEvent = new Event(normalized);
 
         await newEvent.save();
 
@@ -83,8 +104,9 @@ export const updateEvent = async (
 ): Promise<void> => {
     try {
         const eventId = req.params.id; // custom eventId
-        const updateData = req.body;
-        console.log("event.controller, updateEvent ", eventId);
+        const updateData = convertToNull({ ...req.body });
+
+        console.log("event.controller, updateData ", eventId);
         console.log(updateData);
 
         const updatedEvent = await Event.findOneAndUpdate(
@@ -154,6 +176,8 @@ function validateImportRow(
         Dress,
     ] = cols.map((c) => (c ? c.trim() : ""));
 
+    const allowedTypes = ["KL", "KLV", "RS", "TV", "L", "F", ""];
+
     // Day validation
     const day = parseInt(DiM, 10);
     if (isNaN(day) || day < 1 || day > 31) {
@@ -177,6 +201,12 @@ function validateImportRow(
     // H_A check
     if (!["Home", "Away"].includes(H_A)) {
         errors.push(`Invalid H_A: ${H_A}`);
+    }
+
+    // Type check
+    const type = (Type || "").trim().toUpperCase();
+    if (!allowedTypes.includes(type)) {
+        errors.push(`Invalid Type: ${Type}`);
     }
 
     // Dress check
@@ -219,19 +249,21 @@ function buildEvent(
     const day = parseInt(DiM, 10);
     const eventDate = new Date(year, month - 1, day);
 
-    let mix = "";
-    let rinks = "";
+    let mix: string | null = null;
+    let rinks: string | null = null;
     let duration = 3;
     let eventType = "";
-    let dress = "W";
+    let dress: string | null = null;
     let homeAway = (H_A === "Home") ? "H" : "A";
+    let gameType: string | null = null;
 
     if (Rinks) {
         const match = Rinks.match(/^(\d)([LM])([SDTF]?)$/);
         if (match) {
+            console.log(match);
             rinks = String(parseInt(match[1], 10));
-            mix = match[2];
-            if (mix==="M") mix = "X"
+            mix = match[2] === "M" ? "X" : match[2];
+            gameType = match[3] || null;
         }
     }
     switch (Type) {
@@ -261,23 +293,23 @@ function buildEvent(
             duration = 3;
             eventType = "HG";
             rinks = "6";
-            mix = "";    
-            dress = "";    
+            mix = null;    
+            dress = null;    
             break;
         case "F":
             duration = 3;
             eventType = "FG";    
-            dress = Dress;    
+            dress = Dress || null;    
             break;
         default:
             eventType = (rinks !== "") ? "CG" : "CE";
             duration = 3;
             homeAway="H";
-            mix = "";    
-            dress = (rinks !== "") ? "W" : "";    
+            mix = null;    
+            dress = (rinks !== null) ? "W" : null;    
             break;
     }
-    return {
+    const event =  {
         eventId: uuidv4(),
         subject: Game_Event,
         status: "N",
@@ -292,8 +324,10 @@ function buildEvent(
         duration: duration,
         rinks: rinks,
         eventType: eventType,
+        gameType: gameType,
         calKey: mapCalKey(Type),
     };
+    return convertToNull(event);
 }
 
 export const importEvents = async (req: Request, res: Response): Promise<void> => {
@@ -371,7 +405,8 @@ export const importEvents = async (req: Request, res: Response): Promise<void> =
                     return null;
                 }
                 if (currentMonth) {
-                    return buildEvent(cols, currentMonth, thisYear);
+                    const event = buildEvent(cols, currentMonth, thisYear);
+                    return convertToNull(event);
                 }
                 return null;
             })
