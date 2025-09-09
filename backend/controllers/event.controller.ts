@@ -140,7 +140,7 @@ function mapCalKey(Type: string): string {
         case "KL": return "KL";
         case "KLV": return "KV";
         case "RS": return "RSL";
-        case "TVL": return "TV";
+        case "TV": return "TVL";
         case "F": return "FG";
         case "L": return "HG";
         default: return "MTBC";
@@ -258,9 +258,8 @@ function buildEvent(
     let gameType: string | null = null;
 
     if (Rinks) {
-        const match = Rinks.match(/^(\d)([LM])([SDTF]?)$/);
+        const match = Rinks.match(/^(\d)(?:([LM])([SDTF]?))?$/);
         if (match) {
-            console.log(match);
             rinks = String(parseInt(match[1], 10));
             mix = match[2] === "M" ? "X" : match[2];
             gameType = match[3] || null;
@@ -302,7 +301,7 @@ function buildEvent(
             dress = Dress || null;    
             break;
         default:
-            eventType = (rinks !== "") ? "CG" : "CE";
+            eventType = (rinks === null) ? "CE" : "CG";
             duration = 3;
             homeAway="H";
             mix = null;    
@@ -413,8 +412,6 @@ export const importEvents = async (req: Request, res: Response): Promise<void> =
             .filter((e): e is any => e !== null);
 
         
-        console.log("For DB");
-        console.log(validEvents);
         // Transaction to delete + insert atomically
         const session = await mongoose.startSession();
         session.startTransaction();
