@@ -49,8 +49,8 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const NM_USER = process.env.NM_EMAIL_USER;
 const NM_PASS = process.env.NM_EMAIL_PASS;
-console.log("NM User = ", NM_USER);
-console.log("NM Pass = ", NM_PASS);
+//console.log("NM User = ", NM_USER);
+//console.log("NM Pass = ", NM_PASS);
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
