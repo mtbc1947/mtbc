@@ -66,8 +66,8 @@ function parseRinks(rinks: string, gender: string, gameType: string | null): str
     case "M":
       genderMarker = "";
       break;
-    case "M":
-      genderMarker = "X";
+    case "X":
+      genderMarker = "M";
       break;
     default:
       genderMarker = "";

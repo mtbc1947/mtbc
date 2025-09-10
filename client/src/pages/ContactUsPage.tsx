@@ -1,6 +1,8 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
+import axios from "axios";
+
 
 type Contact = {
   name: string;
@@ -54,7 +56,7 @@ const ContactUsPage: React.FC = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setStatus({ success: true, message: 'Message sent successfully!' });
+        setStatus({ success: true, message: data.message || "Message sent successfully!" });
         setFormData({
           firstName: '',
           lastName: '',
@@ -124,37 +126,37 @@ const ContactUsPage: React.FC = () => {
       </div>
 
       {/* Right Column with Form */}
-      <div className="w-full md:w-1/2 flex justify-center h-full px-4 bg-black/70 rounded-md shadow-lg mx-4 md:mx-8">
+      <div className="w-full md:w-1/2 flex justify-center h-full px-4 bg-white/70 rounded-md shadow-lg mx-4 md:mx-8">
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-xl p-8"
         >
-          <h2 className="text-2xl font-semibold text-center text-white mb-6">
+          <h2 className="text-2xl font-semibold text-center text-black mb-6">
             Contact Us
           </h2>
 
           {/* Name Row */}
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="w-full md:w-1/2">
-              <label className="block text-white">First Name</label>
+              <label className="block text-black">First Name</label>
               <input
                 type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="w-full mt-1 p-2 border border-gray-300 rounded"
+                className="w-full mt-1 p-2 border border-gray-300 bg-white rounded"
               />
             </div>
             <div className="w-full md:w-1/2">
-              <label className="block text-white">Last Name</label>
+              <label className="block text-black">Last Name</label>
               <input
                 type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="w-full mt-1 p-2 border border-gray-300 rounded"
+                className="w-full mt-1 p-2 border border-gray-300 bg-white rounded"
               />
             </div>
           </div>
@@ -162,38 +164,38 @@ const ContactUsPage: React.FC = () => {
           {/* Email and Phone Row */}
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="w-full md:w-1/2">
-              <label className="block text-white">Email Address</label>
+              <label className="block text-black">Email Address</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full mt-1 p-2 border border-gray-300 rounded"
+                className="w-full mt-1 p-2 border border-gray-300 bg-white rounded"
               />
             </div>
             <div className="w-full md:w-1/2">
-              <label className="block text-white">Phone Number</label>
+              <label className="block text-black">Phone Number</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full mt-1 p-2 border border-gray-300 rounded"
+                className="w-full mt-1 p-2 border border-gray-300 bg-white rounded"
               />
             </div>
           </div>
 
           {/* Message Field */}
           <div className="mb-6">
-            <label className="block text-white">Message</label>
+            <label className="block text-black">Message</label>
             <textarea
               name="message"
               rows={4}
               value={formData.message}
               onChange={handleChange}
               required
-              className="w-full mt-1 p-2 border border-gray-300 rounded resize-none"
+              className="w-full mt-1 p-2 border border-gray-300 bg-white rounded resize-none"
             />
           </div>
 
