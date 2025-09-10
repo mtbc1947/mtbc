@@ -7,37 +7,6 @@ import { EventDocument } from "../types/event.js";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import csvParser from "csv-parser";
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_SECURE === "true", // false for 587
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
-
-export async function emailFile({
-    filePath,
-    originalName,
-    rowCount,
-}: {
-    filePath: string;
-    originalName: string;
-    rowCount: number;
-}) {
-    const info = await transporter.sendMail({
-        from: `"CSV Importer" <${process.env.SMTP_FROM}>`,
-        to: process.env.SMTP_TO,
-        Game_Event: `CSV Imported (${rowCount} records)`,
-        text: `The uploaded CSV (${originalName}) contained ${rowCount} records.`,
-        attachments: [{ filename: originalName, path: filePath }],
-    });
-
-    console.log("Mailjet email sent:", info.messageId);
-}
 
 // Utility: normalize optional fields "" → null
 function convertToNull<T extends Record<string, any>>(data: T): T {
