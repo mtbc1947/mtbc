@@ -47,12 +47,16 @@ interface ContactFormBody {
 // ---------- App setup ----------
 const app = express();
 const PORT = process.env.PORT || 4000;
+const NM_USER = process.env.NM_EMAIL_USER;
+const NM_PASS = process.env.NM_EMAIL_PASS;
+console.log("NM User = ", NM_USER);
+console.log("NM Pass = ", NM_PASS);
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth:{
-    user: process.env.NM_EMAIL_USER,
-    pass: process.env.NM_EMAIL_PASS,
+    user: NM_USER,
+    pass: NM_PASS,
   }
 })
 /**
