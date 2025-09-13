@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { getAllEventData, EventRecord } from "utilities";
-import { SEO } from 'components';
+import { SEO } from "components";
 
 const monthNames = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -23,17 +23,6 @@ const filterOptions: FilterOption[] = [
   { key: "TVL", label: "Thames Valley", color: ["30", "144", "255"] },
 ];
 
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia(query);
-    const listener = (event: MediaQueryListEvent) => setMatches(event.matches);
-    mediaQueryList.addEventListener("change", listener);
-    return () => mediaQueryList.removeEventListener("change", listener);
-  }, [query]);
-  return matches;
-}
-
 function calculateEndTime(startTime: string, duration: number): string {
   const [startHour, startMin] = startTime.split(":").map(Number);
   const endHour = startHour + Math.floor(duration);
@@ -45,27 +34,20 @@ function calculateEndTime(startTime: string, duration: number): string {
 
 function calculateDayOfWeek(day: number, month: number, year: number): string {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  //const year = new Date().getFullYear(); // adjust if your data spans multiple seasons
   const date = new Date(year, month, day);
   return days[date.getDay()];
 }
 
 function parseDress(dress: string): string {
   if (dress === null) return "";
-  return (dress === "W") ? "White" : "Grey";
+  return dress === "W" ? "White" : "Grey";
 }
 
 function parseRinks(rinks: string, gender: string, gameType: string | null): string {
-  if (rinks === "null") { return ""};
-  if (rinks === "") { return ""};
-  let gameMarker = null;
-  if (gameType) gameMarker = gameType; 
+  if (rinks === "null" || rinks === "") return "";
+  let gameMarker = gameType || null;
   let genderMarker = "";
   switch (gender) {
-    case "L":
-    case "M":
-      genderMarker = "";
-      break;
     case "X":
       genderMarker = "M";
       break;
@@ -74,8 +56,7 @@ function parseRinks(rinks: string, gender: string, gameType: string | null): str
       break;
   }
   if (genderMarker === "" && !gameMarker) gameMarker = "R";
-  const rinkMarker = rinks + genderMarker + gameMarker;
-  return rinkMarker;
+  return rinks + genderMarker + gameMarker;
 }
 
 function formDetailLine(selectedEvent: EventRecord): string[] {
@@ -100,9 +81,11 @@ function formDetailLine(selectedEvent: EventRecord): string[] {
     CE: "Club Event",
     CG: "Club Game",
   };
+
   const venue = selectedEvent.homeAway === "H" ? "Home" : "Away";
   let eventType = "";
   let eventDescription = "";
+
   if (selectedEvent.calKey === "MTBC") {
     eventType = typeMap[selectedEvent.eventType] ?? selectedEvent.eventType;
     eventDescription = descriptionMap[selectedEvent.eventType] ?? "Event";
@@ -110,25 +93,27 @@ function formDetailLine(selectedEvent: EventRecord): string[] {
     eventType = typeMap[selectedEvent.calKey] ?? selectedEvent.calKey;
     eventDescription = descriptionMap[selectedEvent.calKey] ?? "Event";
   }
-  // line 1: EventType (Venue)
-  let line1 = "";
-  if (selectedEvent.eventType === "CE" || selectedEvent.eventType === "CG") {
-    line1 = `${eventType}`;
-  } else {
-    line1 = `${eventType} (${venue})`;
-  }
-  // line 2: Day of Week, Day Month Year
-  const dayOfWeek = calculateDayOfWeek(selectedEvent.reqDate, selectedEvent.reqMonth, selectedEvent.reqYear);
+
+  const line1 =
+    selectedEvent.eventType === "CE" || selectedEvent.eventType === "CG"
+      ? `${eventType}`
+      : `${eventType} (${venue})`;
+
+  const dayOfWeek = calculateDayOfWeek(
+    selectedEvent.reqDate,
+    selectedEvent.reqMonth,
+    selectedEvent.reqYear
+  );
   const line2 = `${dayOfWeek}, ${selectedEvent.reqDate} ${monthNames[selectedEvent.reqMonth]} ${new Date().getFullYear()}`;
 
-  // line 3: Start Time – End Time
-  const endTime = calculateEndTime(selectedEvent.startTime, selectedEvent.duration || 2);
+  const endTime = calculateEndTime(
+    selectedEvent.startTime,
+    selectedEvent.duration || 2
+  );
   const line3 = `${selectedEvent.startTime} – ${endTime}`;
 
-  // line 4: Event Subject
   const line4 = selectedEvent.subject ?? "";
 
-  // line 5: Gender Venue, Event Type
   let gender = "";
   switch (selectedEvent.mix) {
     case "M":
@@ -146,10 +131,12 @@ function formDetailLine(selectedEvent: EventRecord): string[] {
   }
   const line5 = `${gender} ${venue}, ${eventDescription}`;
 
-  // line 6: rinks marker
-  const line6 = parseRinks(String(selectedEvent.rinks), selectedEvent.mix, selectedEvent.gameType);
+  const line6 = parseRinks(
+    String(selectedEvent.rinks),
+    selectedEvent.mix,
+    selectedEvent.gameType
+  );
 
-  // line 7: Dress Code
   let dress = "";
   if (selectedEvent.dress === "W") dress = "Whites";
   else if (selectedEvent.dress === "G") dress = "Greys";
@@ -176,12 +163,12 @@ export default function FixturesPage() {
     filterOptions.reduce((acc, f) => ({ ...acc, [f.key]: true }), {})
   );
   const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
-  const [currentMonthIndex, setCurrentMonthIndex] = useState<number>(() => new Date().getMonth());
+  const [currentMonthIndex, setCurrentMonthIndex] = useState<number>(
+    () => new Date().getMonth()
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 12;
-  const isDesktop = useMediaQuery("(min-width: 768px)");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-
 
   const filteredEvents = useMemo(
     () => events.filter((e) => filters[e.calKey]),
@@ -205,13 +192,16 @@ export default function FixturesPage() {
   const totalPages = Math.ceil(currentMonthEvents.length / eventsPerPage);
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = currentMonthEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+  const currentEvents = currentMonthEvents.slice(
+    indexOfFirstEvent,
+    indexOfLastEvent
+  );
 
-   const isAllSelected = useMemo(
+  const isAllSelected = useMemo(
     () => Object.values(filters).every(Boolean),
     [filters]
   );
-  
+
   function prevMonth() {
     setCurrentMonthIndex((i) => (i === 0 ? 11 : i - 1));
     setCurrentPage(1);
@@ -238,7 +228,7 @@ export default function FixturesPage() {
     setFilters(newFilters);
     setCurrentPage(1);
   }
- 
+
   function paginate(pageNumber: number) {
     setCurrentPage(pageNumber);
   }
@@ -249,15 +239,16 @@ export default function FixturesPage() {
         title="Fixtures – Maidenhead Town Bowls Club"
         description="Displays this season's fixture list"
       />
+
       {/* Filter panel */}
       <div
         className={`fixed z-30 top-0 left-0 h-full w-64 py-16 bg-white border-r border-gray-300 transition-transform duration-300 ease-in-out
           ${isFiltersOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-
         <div className="p-4 md:pt-16 h-full flex flex-col">
           <h2 className="font-bold mb-4 text-xl">Filters</h2>
-          {/* New "All" checkbox */}
+
+          {/* All toggle */}
           <label className="block mb-2 cursor-pointer select-none text-base font-bold">
             <input
               type="checkbox"
@@ -267,6 +258,7 @@ export default function FixturesPage() {
             />
             All
           </label>
+
           {filterOptions.map(({ key, label, color }) => {
             const rgb = `rgb(${color.join(",")})`;
             return (
@@ -274,12 +266,11 @@ export default function FixturesPage() {
                 key={key}
                 className="flex items-center gap-2 mb-2 cursor-pointer select-none text-base"
               >
-                {/* Custom checkbox */}
                 <input
                   type="checkbox"
                   checked={filters[key]}
                   onChange={() => toggleFilter(key)}
-                  className="hidden" // hide native
+                  className="hidden"
                 />
                 <span
                   className={`w-5 h-5 flex items-center justify-center rounded-sm border-2`}
@@ -330,10 +321,10 @@ export default function FixturesPage() {
         </button>
       )}
 
-      {/* Main content with flex-1 restored */}
+      {/* Main content */}
       <div className="flex-1">
         <div className="p-4 md:p-8 bg-white/70 rounded-md shadow-lg mx-4 md:mx-8">
-          {/* New wrapper for the month row to isolate it */}
+          {/* Month nav */}
           <div className="w-full max-w-lg mx-auto">
             <div className="grid grid-cols-[auto_1fr_auto] gap-1 items-center h-10 mb-4">
               <button
@@ -361,41 +352,78 @@ export default function FixturesPage() {
             <ul className="space-y-1">
               {currentEvents.length > 0 ? (
                 currentEvents.map((e) => {
-                  const color = filterOptions.find(f => f.key === e.calKey)?.color || ["128", "128", "128"];
+                  const color =
+                    filterOptions.find((f) => f.key === e.calKey)?.color ||
+                    ["128", "128", "128"];
                   const rgb = `rgb(${color.join(",")})`;
-                  const endTime = calculateEndTime(e.startTime, e.duration || 2);
-                  const DoW = calculateDayOfWeek(e.reqDate, e.reqMonth, e.reqYear);
+                  const endTime = calculateEndTime(
+                    e.startTime,
+                    e.duration || 2
+                  );
+                  const DoW = calculateDayOfWeek(
+                    e.reqDate,
+                    e.reqMonth,
+                    e.reqYear
+                  );
                   const dress = parseDress(e.dress);
-                  const rinkMarker = parseRinks(String(e.rinks), e.mix, e.gameType);
+                  const rinkMarker = parseRinks(
+                    String(e.rinks),
+                    e.mix,
+                    e.gameType
+                  );
 
                   return (
                     <li
                       key={e.eventId}
                       onClick={() => setSelectedEvent(e)}
-                      className="cursor-pointer md: px-4 py-1 rounded-md hover:bg-gray-200 flex items-center gap-2"
+                      className="cursor-pointer py-1 rounded-md hover:bg-gray-200
+                        grid gap-2 items-center px-2
+                        grid-cols-[2rem_3rem_1rem_auto_2rem_1fr]
+                        md:px-4
+                        md:grid-cols-[2rem_3rem_1rem_minmax(6rem,8rem)_minmax(5rem,6rem)_minmax(3rem,4rem)_minmax(3rem,4rem)_1fr]"
                     >
-                      <div className="w-8 text-xl text-gray-800">{e.reqDate}</div>
-                      <div className="w-10 text-base text-gray-700">{DoW}</div>
+                      {/* Date */}
+                      <div className="text-xl text-gray-800">{e.reqDate}</div>
+
+                      {/* Day of week */}
+                      <div className="text-base text-gray-700">{DoW}</div>
+
+                      {/* Color dot */}
                       <div className="w-4 h-4 rounded-full" style={{ backgroundColor: rgb }} />
-                      <div className="text-base text-gray-800">
-                        {e.startTime} – {endTime}
+
+                      {/* Time */}
+                      <div className="text-base text-gray-800 truncate">
+                        <span className="md:hidden">{e.startTime}</span>
+                        <span className="hidden md:inline">{e.startTime} – {endTime}</span>
                       </div>
-                      <div className="w-15 text-base text-gray-700">
-                        {e.homeAway === "H" ? "Home" : "Away"}
+
+                      {/* Home/Away */}
+                      <div className="text-base text-gray-700 text-center">
+                        <span className="md:hidden">{e.homeAway}</span>
+                        <span className="hidden md:inline">{e.homeAway === "H" ? "Home" : "Away"}</span>
                       </div>
-                      <div className="w-10 text-base text-gray-700">{dress}</div>
-                      <div className="w-10 text-base text-gray-700">{rinkMarker}</div>
-                      <div className="text-base text-gray-700">{e.subject}</div>
+
+                      {/* Dress (desktop only) */}
+                      <div className="hidden md:block text-base text-gray-700">{dress}</div>
+
+                      {/* Rinks (desktop only) */}
+                      <div className="hidden md:block text-base text-gray-700">{rinkMarker}</div>
+
+                      {/* Subject (always shown, last col grows) */}
+                      <div className="text-base text-gray-700 truncate">{e.subject}</div>
                     </li>
+
                   );
                 })
               ) : (
-                <p className="text-center text-gray-500">No events found for this month.</p>
+                <p className="text-center text-gray-500">
+                  No events found for this month.
+                </p>
               )}
             </ul>
           </div>
-          
-          {/* Pagination Controls */}
+
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-4">
               <button
@@ -405,15 +433,21 @@ export default function FixturesPage() {
               >
                 Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
                   <button
                     key={page}
                     onClick={() => paginate(page)}
-                    className={`px-3 py-1 rounded ${currentPage === page ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200"
+                    }`}
                   >
                     {page}
                   </button>
-              ))}
+                )
+              )}
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
@@ -426,11 +460,16 @@ export default function FixturesPage() {
         </div>
       </div>
 
-      {/* Event details modal - animated sliding in from right */}
+      {/* Event details modal */}
       {selectedEvent && (
         <div
           className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-green-300 rounded-lg p-6 max-w-md w-full shadow-xl transition-transform duration-300 ease-in-out pointer-events-auto"
-          style={{ marginRight: "1rem", maxHeight: "90vh", overflowY: "auto", animation: "slideInRight 0.3s ease forwards" }}
+          style={{
+            marginRight: "1rem",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            animation: "slideInRight 0.3s ease forwards",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -457,13 +496,14 @@ export default function FixturesPage() {
           })()}
         </div>
       )}
-      <style>{`
+
+      <style jsx>{`
         @keyframes slideInRight {
           from {
-            transform: translateX(100%) translateY(-50%);
+            transform: translateX(100%);
           }
           to {
-            transform: translateX(0) translateY(-50%);
+            transform: translateX(0);
           }
         }
       `}</style>
