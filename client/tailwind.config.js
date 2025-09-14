@@ -18,6 +18,15 @@ export default {
                 "6xl": "60px",
                 "7xl": "72px",
             },
+            keyframes: {
+                slideInRight: {
+                from: { transform: "translateX(100%)" },
+                to: { transform: "translateX(0)" },
+                },
+            },
+            animation: {
+                slideInRight: "slideInRight 0.3s ease forwards",
+            },
         },
     },
     plugins: [],
