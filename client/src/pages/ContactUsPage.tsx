@@ -1,6 +1,7 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
+import { getRefDataValuesByPage } from 'utilities';
 
 
 type Contact = {
@@ -10,9 +11,9 @@ type Contact = {
 
 const contacts: Contact[] = [
   { name: 'Maidenhead Town', phone: '01628-675-911' },
-  { name: 'Lesley Monaghan (Club Secretary)', phone: '07848-919-010' },
-  { name: "Kim Eales (Ladies' Captain)", phone: '07887-848-447' },
-  { name: "Tim Eales (Men's Captain)", phone: '07766-130-664' },
+  { name: '(Club Secretary)', phone: '' },
+  { name: "(Ladies' Captain)", phone: '' },
+  { name: "(Men's Captain)", phone: '' },
 ];
 
 type FormData = {
@@ -38,6 +39,27 @@ const ContactUsPage: React.FC = () => {
   });
 
   const [status, setStatus] = useState<Status>(null);
+  const [strings, setStrings] = useState<string[]>([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await getRefDataValuesByPage("ContactUs");
+      // Assume data is string[]
+      setStrings(data as string[]);
+    };
+    getData();
+  }, []);
+
+  // Safely access strings with fallback empty strings
+  let wLine2=contacts[1];
+    wLine2.name = strings[0] ?? "";
+    wLine2.phone = strings[1] ?? "";
+  let wLine3=contacts[2];
+    wLine3.name = strings[2] ?? "";
+    wLine3.phone = strings[3] ?? "";
+  let wLine4=contacts[3];
+    wLine4.name = strings[4] ?? "";
+    wLine4.phone = strings[5] ?? "";
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
