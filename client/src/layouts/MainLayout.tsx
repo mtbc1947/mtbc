@@ -24,21 +24,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({ backgroundImage, centerContent 
         />
       )}
 
-      {/* Main Content Wrapper */}
+      {/* NavBar */}
       <Navbar />
       
+      {/* Main Content */}
       <main
         className={`
-          relative z-10
+          relative z-10 flex-1
           ${centerContent
-            ? 'flex items-center justify-center min-h-[calc(100vh-64px-64px)]'
-            : 'px-4 py-6 sm:px-6 sm:py-8'}
+            ? 'flex items-center justify-center md:pb-16'
+            : 'px-4 py-6 sm:px-6 sm:py-8 md:pb-16'}
         `}
       >
         {children}
       </main>
 
-      <Footer />
+      {/* Fixed Footer */}
+      <div className="md:fixed md:bottom-0 md:left-0 md:w-full z-20">
+        <Footer />
+      </div>
     </div>
   );
 };

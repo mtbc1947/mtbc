@@ -16,6 +16,7 @@ export { default as NewsReportsPage } from "./NewsReportsPage";
 export { default as NoticeBoardPage } from "./NoticeBoardPage";
 export { default as OfficersPage } from "./OfficersPage";
 export { default as OpenDayPage } from "./OpenDayPage";
+export { default as PhotoPage } from "./PhotoPage";
 export { default as PresidentsPage } from "./PresidentsPage";
 export { default as PrivacyPage } from "./PrivacyPage";
 export { default as SocialPage } from "./SocialPage";

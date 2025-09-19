@@ -37,6 +37,7 @@ const menuGroup2: MenuGroupIf[] = [
     key: "more",
     items: [
       { label: "Admin", to: "/admin" },
+      { label: "Photos", to: "/photo" },
     ],
   },
 ];

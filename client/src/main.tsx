@@ -37,6 +37,7 @@ import contactUsBackground from "./assets/green1.jpg";
 import fixturesBackground from "./assets/green1.jpg";
 import bookingBackground from "./assets/green1.jpg";
 import countyPresidentsBackground from "./assets/green1.jpg";
+import photoBackground from "./assets/green1.jpg";
 import presidentsBackground from "./assets/green1.jpg";
 import adminBackground from "./assets/green1.jpg";
 import notFoundBackground from "./assets/green1.jpg";
@@ -61,6 +62,7 @@ import {
   ContactUsPage,
   BookingPage,
   CountyPresidentsPage,
+  PhotoPage,
   PresidentsPage,
   AdminPage,
   MaintainRefDataPage,
@@ -70,6 +72,8 @@ import {
   MaintainOfficerPage,
   NotFoundPage,
 } from "./pages";
+
+import galleries from "./galleries";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +96,7 @@ const router = createBrowserRouter([
       { path: "/fixtures", element: <PageWithBackground backgroundImage={fixturesBackground} Component={FixturesPage} /> },
       { path: "/booking", element: <PageWithBackground backgroundImage={bookingBackground} Component={BookingPage} centerContent /> },
       { path: "/countyPresidents", element: <PageWithBackground backgroundImage={countyPresidentsBackground} Component={CountyPresidentsPage} /> },
+      { path: "/photo", element: <PageWithBackground backgroundImage={photoBackground} Component={PhotoPage} /> },
       { path: "/presidents", element: <PageWithBackground backgroundImage={presidentsBackground} Component={PresidentsPage} /> },
       { path: "/admin", element: <PageWithBackground backgroundImage={adminBackground} Component={AdminPage} /> },
       { path: "/maintainRefData", element: <PageWithBackground backgroundImage={adminBackground} Component={MaintainRefDataPage} /> },
