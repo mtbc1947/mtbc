@@ -13,7 +13,7 @@ export default function PhotoPage() {
   const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(true);
-
+  /**
   useEffect(() => {
     async function fetchImages() {
       try {
@@ -30,7 +30,8 @@ export default function PhotoPage() {
   }, []);
 
   if (loading) return <p>Loading…</p>;
-
+  */
+ 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px-64px)]">
       {!selectedGallery ? (
