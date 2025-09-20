@@ -99,10 +99,10 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
       {/* Lightbox */}
       {lightboxOpen && (
         <Lightbox
-          open={lightboxOpen}
-          close={() => setLightboxOpen(false)}
-          index={lightboxIndex}
-          slides={gallery.photos.map((src) => ({ src }))}
+            open={lightboxOpen}
+            close={() => setLightboxOpen(false)}
+            index={lightboxIndex}
+            slides={gallery.photos.map((photo) => ({ src: photo.url }))} 
         />
       )}
     </div>
