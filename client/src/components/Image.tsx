@@ -7,9 +7,10 @@ interface ImageProps {
   w?: number | string;
   h?: number | string;
   alt?: string;
+  onClick?: React.MouseEventHandler<HTMLImageElement>;
 }
 
-const Image: React.FC<ImageProps> = ({ src, className, w, h, alt }) => {
+const Image: React.FC<ImageProps> = ({ src, className, w, h, alt, onClick }) => {
   return (
     <IKImage
       urlEndpoint={import.meta.env.VITE_IK_URL_ENDPOINT}
@@ -19,6 +20,7 @@ const Image: React.FC<ImageProps> = ({ src, className, w, h, alt }) => {
       loading="lazy"
       width={w}
       height={h}
+      onClick={onClick}
     />
   );
 };

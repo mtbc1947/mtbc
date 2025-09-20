@@ -8,6 +8,7 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
 import { Gallery } from "../galleries";
+import Image from "./Image"; // your ImageKit wrapper
 
 interface GalleryViewProps {
   gallery: Gallery;
@@ -61,10 +62,10 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
             centeredSlides={true}
             onSlideChange={(swiper) => setLightboxIndex(swiper.activeIndex)}
           >
-            {gallery.photos.map((src, i) => (
-              <SwiperSlide key={i} className="flex justify-center">
+            {gallery.photos.map((photo, i) => (
+              <SwiperSlide key={(i+1)} className="flex justify-center">
                 <img
-                  src={src}
+                  src={photo.url}         // use ImageKit URL
                   alt={`${gallery.title} ${i + 1}`}
                   className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-md cursor-pointer"
                   onClick={() => setLightboxOpen(true)}
