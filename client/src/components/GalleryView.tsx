@@ -39,8 +39,9 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
 
       {/* Carousel */}
       <div className="w-full flex justify-center relative">
-        <div className="w-full max-w-4xl mx-auto relative">
+        <div className="border-8  border-red-500 w-full max-w-4xl mx-auto relative">
           <Swiper
+            className="h-[70vh]"
             modules={[Navigation]}
             slidesPerView={1}
             spaceBetween={20}
