@@ -8,7 +8,6 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
 import { Gallery } from "../galleries";
-import Image from "./Image"; // your ImageKit wrapper
 
 interface GalleryViewProps {
   gallery: Gallery;
@@ -43,29 +42,26 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
         <div className="w-full max-w-4xl mx-auto relative">
           <Swiper
             modules={[Navigation]}
+            slidesPerView={1}
+            spaceBetween={20}
+            centeredSlides
+            // ✅ Attach custom arrows BEFORE initialization
+            onBeforeInit={(swiper) => {
+              // @ts-ignore
+              swiper.params.navigation.prevEl = prevRef.current;
+              // @ts-ignore
+              swiper.params.navigation.nextEl = nextRef.current;
+            }}
             navigation={{
               prevEl: prevRef.current,
               nextEl: nextRef.current,
             }}
-            onInit={(swiper) => {
-              if (swiper.params.navigation) {
-                // @ts-ignore
-                swiper.params.navigation.prevEl = prevRef.current;
-                // @ts-ignore
-                swiper.params.navigation.nextEl = nextRef.current;
-                swiper.navigation.init();
-                swiper.navigation.update();
-              }
-            }}
-            slidesPerView={1}
-            spaceBetween={20}
-            centeredSlides={true}
             onSlideChange={(swiper) => setLightboxIndex(swiper.activeIndex)}
           >
             {gallery.photos.map((photo, i) => (
-              <SwiperSlide key={(i+1)} className="flex justify-center">
+              <SwiperSlide key={i} className="flex justify-center">
                 <img
-                  src={photo.url}         // use ImageKit URL
+                  src={photo.url}
                   alt={`${gallery.title} ${i + 1}`}
                   className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-md cursor-pointer"
                   onClick={() => setLightboxOpen(true)}
@@ -74,22 +70,25 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
             ))}
           </Swiper>
 
-          {/* Navigation buttons */}
+          {/* Custom Navigation Buttons */}
           <div
             ref={prevRef}
-            className={`absolute top-1/2 -translate-y-1/2 z-10 text-3xl md:text-5xl cursor-pointer text-white bg-black/40 hover:bg-black/60 p-2 md:p-3 rounded-full select-none left-2 md:left-[-50px] ${
-              lightboxIndex === 0 ? "opacity-30 cursor-not-allowed pointer-events-none" : ""
-            }`}
+            className={`absolute top-1/2 -translate-y-1/2 z-10 text-3xl md:text-5xl
+              cursor-pointer text-white bg-black/40 hover:bg-black/60 p-2 md:p-3
+              rounded-full select-none left-2 md:left-[-50px]
+              ${lightboxIndex === 0 ? "opacity-30 cursor-not-allowed pointer-events-none" : ""}`}
           >
             ‹
           </div>
+
           <div
             ref={nextRef}
-            className={`absolute top-1/2 -translate-y-1/2 z-10 text-3xl md:text-5xl cursor-pointer text-white bg-black/40 hover:bg-black/60 p-2 md:p-3 rounded-full select-none right-2 md:right-[-50px] ${
-              lightboxIndex === gallery.photos.length - 1
+            className={`absolute top-1/2 -translate-y-1/2 z-10 text-3xl md:text-5xl
+              cursor-pointer text-white bg-black/40 hover:bg-black/60 p-2 md:p-3
+              rounded-full select-none right-2 md:right-[-50px]
+              ${lightboxIndex === gallery.photos.length - 1
                 ? "opacity-30 cursor-not-allowed pointer-events-none"
-                : ""
-            }`}
+                : ""}`}
           >
             ›
           </div>
@@ -99,10 +98,10 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
       {/* Lightbox */}
       {lightboxOpen && (
         <Lightbox
-            open={lightboxOpen}
-            close={() => setLightboxOpen(false)}
-            index={lightboxIndex}
-            slides={gallery.photos.map((photo) => ({ src: photo.url }))} 
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={lightboxIndex}
+          slides={gallery.photos.map((photo) => ({ src: photo.url }))}
         />
       )}
     </div>
