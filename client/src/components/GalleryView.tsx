@@ -60,9 +60,9 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
 
       {/* Carousel */}
       <div className="w-full flex justify-center relative">
-        <div className="border-8 border-red-500 w-full max-w-4xl mx-auto relative">
+        <div className="w-full max-w-4xl mx-auto relative">
           <Swiper
-            className="h-[70vh]"
+            className="h-[70vh] w-full"
             modules={[Navigation]}
             slidesPerView={1}
             spaceBetween={20}
@@ -71,7 +71,7 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
             onSlideChange={(swiper) => setLightboxIndex(swiper.activeIndex)}
           >
             {gallery.photos.map((photo, i) => (
-              <SwiperSlide key={i} className="flex justify-center">
+              <SwiperSlide key={i} className="flex items-center justify-center h-full">
                 <img
                   src={photo.url}
                   alt={`${gallery.title} ${i + 1}`}

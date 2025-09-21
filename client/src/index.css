@@ -56,3 +56,8 @@ body, html {
   margin: 0;
   padding: 0;
 }
+.swiper-slide {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
