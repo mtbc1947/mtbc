@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -17,9 +17,30 @@ interface GalleryViewProps {
 export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [swiperInstance, setSwiperInstance] = useState<any>(null);
 
   const prevRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
+
+  // Attach custom navigation after Swiper mounts and refs exist
+    useEffect(() => {
+    if (
+        swiperInstance &&
+        swiperInstance.params &&
+        swiperInstance.navigation &&
+        prevRef.current &&
+        nextRef.current
+    ) {
+        // Attach custom navigation
+        swiperInstance.params.navigation.prevEl = prevRef.current;
+        swiperInstance.params.navigation.nextEl = nextRef.current;
+
+        // Re-initialize navigation
+        swiperInstance.navigation.destroy();
+        swiperInstance.navigation.init();
+        swiperInstance.navigation.update();
+    }
+    }, [swiperInstance]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
@@ -39,24 +60,14 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
 
       {/* Carousel */}
       <div className="w-full flex justify-center relative">
-        <div className="border-8  border-red-500 w-full max-w-4xl mx-auto relative">
+        <div className="border-8 border-red-500 w-full max-w-4xl mx-auto relative">
           <Swiper
             className="h-[70vh]"
             modules={[Navigation]}
             slidesPerView={1}
             spaceBetween={20}
             centeredSlides
-            // ✅ Attach custom arrows BEFORE initialization
-            onBeforeInit={(swiper) => {
-              // @ts-ignore
-              swiper.params.navigation.prevEl = prevRef.current;
-              // @ts-ignore
-              swiper.params.navigation.nextEl = nextRef.current;
-            }}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            }}
+            onSwiper={setSwiperInstance}
             onSlideChange={(swiper) => setLightboxIndex(swiper.activeIndex)}
           >
             {gallery.photos.map((photo, i) => (
