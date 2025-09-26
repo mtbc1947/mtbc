@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 
-console.log("refData Route");
+console.log("RefData Route");
 
 router.get("/", getAllRefData);
 router.get("/webPage/:webPage", getPageRefData);

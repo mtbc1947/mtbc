@@ -7,10 +7,14 @@ import "swiper/css/navigation";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
-import { Gallery } from "../galleries";
+import {
+  GalleryRecord,
+  GalleryImage,
+  getGalleryImages,
+} from "../utilities/galleryUtils";
 
 interface GalleryViewProps {
-  gallery: Gallery;
+  gallery: GalleryRecord;
   onBack: () => void;
 }
 
@@ -18,29 +22,63 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const prevRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
 
   // Attach custom navigation after Swiper mounts and refs exist
-    useEffect(() => {
+  useEffect(() => {
     if (
-        swiperInstance &&
-        swiperInstance.params &&
-        swiperInstance.navigation &&
-        prevRef.current &&
-        nextRef.current
+      swiperInstance &&
+      swiperInstance.params &&
+      swiperInstance.navigation &&
+      prevRef.current &&
+      nextRef.current
     ) {
-        // Attach custom navigation
-        swiperInstance.params.navigation.prevEl = prevRef.current;
-        swiperInstance.params.navigation.nextEl = nextRef.current;
+      swiperInstance.params.navigation.prevEl = prevRef.current;
+      swiperInstance.params.navigation.nextEl = nextRef.current;
 
-        // Re-initialize navigation
-        swiperInstance.navigation.destroy();
-        swiperInstance.navigation.init();
-        swiperInstance.navigation.update();
+      swiperInstance.navigation.destroy();
+      swiperInstance.navigation.init();
+      swiperInstance.navigation.update();
     }
-    }, [swiperInstance]);
+  }, [swiperInstance]);
+
+  // ✅ Fetch images using the gallery's folderName
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const imgs = await getGalleryImages(gallery.folderName);
+        setImages(imgs);
+      } catch (err) {
+        console.error("Failed to fetch gallery images:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchImages();
+  }, [gallery.folderName]);
+
+  if (loading) return <p className="text-center py-10">Loading images…</p>;
+
+  // ✅ No images found
+  if (images.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+          No images found in this gallery.
+        </h2>
+        <button
+          onClick={onBack}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+        >
+          ← Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
@@ -70,10 +108,13 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
             onSwiper={setSwiperInstance}
             onSlideChange={(swiper) => setLightboxIndex(swiper.activeIndex)}
           >
-            {gallery.photos.map((photo, i) => (
-              <SwiperSlide key={i} className="flex items-center justify-center h-full">
+            {images.map((img, i) => (
+              <SwiperSlide
+                key={i}
+                className="flex items-center justify-center h-full"
+              >
                 <img
-                  src={photo.url}
+                  src={img.url}
                   alt={`${gallery.title} ${i + 1}`}
                   className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-md cursor-pointer"
                   onClick={() => setLightboxOpen(true)}
@@ -98,7 +139,7 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
             className={`absolute top-1/2 -translate-y-1/2 z-10 text-3xl md:text-5xl
               cursor-pointer text-white bg-black/40 hover:bg-black/60 p-2 md:p-3
               rounded-full select-none right-2 md:right-[-50px]
-              ${lightboxIndex === gallery.photos.length - 1
+              ${lightboxIndex === images.length - 1
                 ? "opacity-30 cursor-not-allowed pointer-events-none"
                 : ""}`}
           >
@@ -113,7 +154,7 @@ export default function GalleryView({ gallery, onBack }: GalleryViewProps) {
           open={lightboxOpen}
           close={() => setLightboxOpen(false)}
           index={lightboxIndex}
-          slides={gallery.photos.map((photo) => ({ src: photo.url }))}
+          slides={images.map((img) => ({ src: img.url }))}
         />
       )}
     </div>

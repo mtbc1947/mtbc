@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface CommandsProps {
   editMode: boolean;
@@ -10,7 +10,10 @@ interface CommandsProps {
   onDelete: () => void;
   onSave: () => void;
   onCancel: () => void;
-  onUpload?: (file: File) => Promise<void>;  // optional
+  onUploadCSV?: (file: File) => Promise<void>;
+  onUploadFile?: (file: File) => Promise<void>;
+  onUploadFolder?: (files: File[]) => Promise<void>;
+  folderUploadProgress?: number; // 0 or undefined means idle
 }
 
 export function Commands({
@@ -22,47 +25,90 @@ export function Commands({
   onDelete,
   onSave,
   onCancel,
-  onUpload,
+  onUploadCSV,
+  onUploadFile,
+  onUploadFolder,
+  folderUploadProgress,
 }: CommandsProps) {
   const navigate = useNavigate();
+
+  const csvInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
-  const handleMenuClick = () => {
-    navigate('/admin');
-  };
+  useEffect(() => {
+    if (folderInputRef.current) {
+      folderInputRef.current.setAttribute("webkitdirectory", "");
+      folderInputRef.current.setAttribute("directory", "");
+    }
+  }, []);
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleMenuClick = () => navigate("/admin");
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && onUpload) {
-      setSelectedFileName(file.name);
-      setModalVisible(true);
-      setUploading(true);
-      setUploadMessage(null);
-
-      try {
-        await onUpload(file);
-        setUploadMessage('Upload successful!');
-      } catch (err) {
-        console.error(err);
-        setUploadMessage('Upload failed. Please try again.');
-      } finally {
-        setUploading(false);
-        event.target.value = ''; // Clear file input so same file can be re-uploaded
-      }
+  const startUpload = async (
+    file: File,
+    handler: (file: File) => Promise<void>
+  ) => {
+    setSelectedFileName(file.name);
+    setModalVisible(true);
+    setUploading(true);
+    setUploadMessage(null);
+    try {
+      await handler(file);
+      setUploadMessage("Upload successful!");
+    } catch (err) {
+      console.error(err);
+      setUploadMessage("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
     }
   };
 
+  const handleCSVChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onUploadCSV) await startUpload(file, onUploadCSV);
+    e.target.value = "";
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onUploadFile) await startUpload(file, onUploadFile);
+    e.target.value = "";
+  };
+
+  const handleFolderChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (onUploadFolder && e.target.files?.length) {
+      const files = Array.from(e.target.files);
+
+      // Filter out files in subfolders
+      const topLevelFiles = files.filter(file => {
+        // webkitRelativePath example: "finals_sun/image1.jpg"
+        // we only want files with no subfolder, i.e., no slash after folder
+        return !file.webkitRelativePath.includes('/') || 
+              file.webkitRelativePath.split('/').length === 2; 
+        // length === 2: ["folderName", "fileName"]
+      });
+
+      try {
+        await onUploadFolder(topLevelFiles);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    e.target.value = "";
+  };
+
+  // 🔑 Disable all command buttons while a folder upload is in progress
+  const buttonsDisabled =
+    folderUploadProgress !== undefined && folderUploadProgress > 0;
+
   return (
     <>
-      {/* Modal */}
       {modalVisible && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-lg p-6 w-96">
@@ -74,9 +120,7 @@ export function Commands({
                 <div className="bg-yellow-500 h-4 rounded-full animate-pulse w-full" />
               </div>
             ) : (
-              <div className="mb-4 text-sm text-gray-700">
-                {uploadMessage}
-              </div>
+              <div className="mb-4 text-sm text-gray-700">{uploadMessage}</div>
             )}
 
             {!uploading && (
@@ -95,54 +139,133 @@ export function Commands({
         </div>
       )}
 
-      {/* Commands Panel */}
       <div className="bg-white bg-opacity-80 rounded-2xl shadow-lg p-4 w-full md:w-64 flex flex-col items-stretch">
-        <h2 className="text-lg font-bold text-center text-gray-800 mb-4">Actions</h2>
+        <h2 className="text-lg font-bold text-center text-gray-800 mb-4">
+          Actions
+        </h2>
 
         <div className="flex flex-row md:flex-col gap-2 mb-4">
           {!editMode ? (
             <>
               <button
                 onClick={onCreate}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+                disabled={buttonsDisabled}
+                className={`px-4 py-2 rounded w-full ${
+                  buttonsDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
+                }`}
               >
                 New
               </button>
+
               <button
                 onClick={onEdit}
-                disabled={!canEdit}
+                disabled={!canEdit || buttonsDisabled}
                 className={`px-4 py-2 rounded w-full ${
-                  canEdit ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  !canEdit || buttonsDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
                 }`}
               >
                 Edit
               </button>
+
               <button
                 onClick={onDelete}
-                disabled={!canDelete}
+                disabled={!canDelete || buttonsDisabled}
                 className={`px-4 py-2 rounded w-full ${
-                  canDelete ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  !canDelete || buttonsDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
                 }`}
               >
                 Delete
               </button>
 
-              {/* Only show Upload CSV if onUpload prop exists */}
-              {onUpload && (
+              {onUploadCSV && (
                 <>
                   <button
-                    onClick={handleUploadClick}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+                    onClick={() => csvInputRef.current?.click()}
+                    disabled={buttonsDisabled}
+                    className={`px-4 py-2 rounded w-full ${
+                      buttonsDisabled
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-yellow-500 text-white hover:bg-yellow-600"
+                    }`}
                   >
                     Upload CSV
                   </button>
                   <input
-                    ref={fileInputRef}
+                    ref={csvInputRef}
                     type="file"
                     accept=".csv"
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
+                    onChange={handleCSVChange}
+                    style={{ display: "none" }}
                   />
+                </>
+              )}
+
+              {onUploadFile && (
+                <>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={!canEdit || buttonsDisabled}
+                    className={`px-4 py-2 rounded w-full ${
+                      !canEdit || buttonsDisabled
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-yellow-500 text-white hover:bg-yellow-600"
+                    }`}
+                  >
+                    Upload File
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </>
+              )}
+
+              {onUploadFolder && (
+                <>
+                  <button
+                    onClick={() => folderInputRef.current?.click()}
+                    disabled={!canEdit || buttonsDisabled}
+                    className={`px-4 py-2 rounded w-full ${
+                      !canEdit || buttonsDisabled
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-yellow-500 text-white hover:bg-yellow-600"
+                    }`}
+                  >
+                    Upload Folder
+                  </button>
+                  <input
+                    ref={folderInputRef}
+                    type="file"
+                    onChange={handleFolderChange}
+                    style={{ display: "none" }}
+                  />
+
+                  {folderUploadProgress !== undefined && folderUploadProgress > 0 && (
+                    <div className="w-full mb-2">
+                      {/* Progress bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                        <div
+                          className="bg-yellow-500 h-2 rounded transition-all"
+                          style={{
+                            width: `${folderUploadProgress}%`,
+                          }}
+                        />
+                      </div>
+                      {/* Percentage */}
+                      <p className="text-xs text-center text-gray-700">
+                        {folderUploadProgress}%
+                      </p>
+                    </div>
+                  )}
+
                 </>
               )}
             </>
@@ -150,13 +273,23 @@ export function Commands({
             <>
               <button
                 onClick={onSave}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+                disabled={buttonsDisabled}
+                className={`px-4 py-2 rounded w-full ${
+                  buttonsDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
+                }`}
               >
                 Save
               </button>
               <button
                 onClick={onCancel}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full"
+                disabled={buttonsDisabled}
+                className={`px-4 py-2 rounded w-full ${
+                  buttonsDisabled
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-yellow-500 text-white hover:bg-yellow-600"
+                }`}
               >
                 Cancel
               </button>

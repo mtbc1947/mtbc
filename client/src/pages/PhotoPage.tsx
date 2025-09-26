@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import GalleryList from "../components/GalleryList";
 import GalleryView from "../components/GalleryView";
-import galleries, { Gallery } from "../galleries";
+import { GalleryRecord } from "../utilities/galleryUtils";
+import { getAllGallery } from "utilities"; // adjust path as needed
 
 interface ImageData {
   id: string;
@@ -10,33 +11,38 @@ interface ImageData {
 }
 
 export default function PhotoPage() {
-  const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
+  const [selectedGallery, setSelectedGallery] = useState<GalleryRecord | null>(null);
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(true);
-  /**
+  const [galleries, setGalleries] = useState<GalleryRecord[]>([]);
+
   useEffect(() => {
-    async function fetchImages() {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`/api/images?folder=/galleries/yourFolder`);
-        const data: ImageData[] = await res.json();
-        setImages(data);
-      } catch (err) {
-        console.error("Failed to load images", err);
+        const data = await getAllGallery();
+        setGalleries(data);
+      } catch (error) {
+        console.error("Failed to load Gallery data:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); // ✅ stop the loading spinner
       }
-    }
-    fetchImages();
+    };
+    fetchData();
   }, []);
 
   if (loading) return <p>Loading…</p>;
-  */
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px-80px)]">
       {!selectedGallery ? (
         <div className="w-full max-w-5xl mx-auto">
-          <GalleryList galleries={galleries} onOpen={setSelectedGallery} />
+          {galleries.length > 0 ? (
+            <GalleryList galleries={galleries} onOpen={setSelectedGallery} />
+          ) : (
+            <p className="text-center text-black text-5xl">
+              No Galleries found.
+            </p>
+          )}
         </div>
       ) : (
         <div className="w-full max-w-4xl mx-auto">

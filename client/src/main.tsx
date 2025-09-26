@@ -5,7 +5,7 @@ if (import.meta.env.DEV) {
   });
 }
 
-import React, { StrictMode } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -42,7 +42,6 @@ import presidentsBackground from "./assets/green1.jpg";
 import adminBackground from "./assets/green1.jpg";
 import notFoundBackground from "./assets/green1.jpg";
 
-import { MainLayout } from "./layouts";
 import { ErrorBoundary } from "./components";
 import { RouteError } from "./components";
 
@@ -66,6 +65,7 @@ import {
   PresidentsPage,
   AdminPage,
   MaintainRefDataPage,
+  MaintainGalleryPage,
   MaintainEventPage,
   MaintainMemberPage,
   MaintainCommitteePage,
@@ -73,7 +73,6 @@ import {
   NotFoundPage,
 } from "./pages";
 
-import galleries from "./galleries";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +99,7 @@ const router = createBrowserRouter([
       { path: "/presidents", element: <PageWithBackground backgroundImage={presidentsBackground} Component={PresidentsPage} /> },
       { path: "/admin", element: <PageWithBackground backgroundImage={adminBackground} Component={AdminPage} /> },
       { path: "/maintainRefData", element: <PageWithBackground backgroundImage={adminBackground} Component={MaintainRefDataPage} /> },
+      { path: "/maintainGallery", element: <PageWithBackground backgroundImage={adminBackground} Component={MaintainGalleryPage} /> },
       { path: "/maintainEvent", element: <PageWithBackground backgroundImage={adminBackground} Component={MaintainEventPage} /> },
       { path: "/maintainMember", element: <PageWithBackground backgroundImage={adminBackground} Component={MaintainMemberPage} /> },
       { path: "/maintainCommittee", element: <PageWithBackground backgroundImage={adminBackground} Component={MaintainCommitteePage} /> },

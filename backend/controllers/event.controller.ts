@@ -380,7 +380,8 @@ export const importEvents = async (req: Request, res: Response): Promise<void> =
             })
             .filter((e): e is any => e !== null);
 
-        
+        /**
+
         // Transaction to delete + insert atomically
         const session = await mongoose.startSession();
         session.startTransaction();
@@ -394,6 +395,7 @@ export const importEvents = async (req: Request, res: Response): Promise<void> =
         } finally {
             session.endSession();
         }
+        */
         fs.unlink(filePath, () => {}); // cleanup
 
         res.status(200).json({

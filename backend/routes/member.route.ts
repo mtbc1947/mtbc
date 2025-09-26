@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 
-console.log("member Route");
+console.log("Member Route");
 
 router.get("/", getAllMembers);
 router.get("/:id", getMember);

@@ -2,6 +2,7 @@ export interface Gallery {
   id: number;
   title: string;
   cover: string;
+  description: string;
   photos: { url: string; name?: string }[];
 }
 
@@ -32,6 +33,11 @@ const galleries: Gallery[] = [
     photos: [
       {url: "/photos/finals_sun_2025/1r7a8560.jpg"},
       {url: "/photos/finals_sun_2025/1r7a8563.jpg"},
+      {url: "/photos/finals_sun_2025/S1200_100.jpg"},
+      {url: "/photos/finals_sun_2025/S1200_90.jpg"},
+      {url: "/photos/finals_sun_2025/S1200_80.jpg"},
+      {url: "/photos/finals_sun_2025/S1200_70.jpg"},
+      {url: "/photos/finals_sun_2025/S1200_60.jpg"},
     ],
   },
 ];

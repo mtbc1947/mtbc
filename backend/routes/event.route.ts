@@ -10,9 +10,9 @@ import multer from "multer";
 
 const router = express.Router();
 
-console.log("event Route");
+console.log("Event Route");
 
-const upload = multer({ dest: "tmp/" }); /*  */
+const upload = multer({ dest: "tmp/" });
 
 router.get("/", getEvents);
 router.post("/", createEvent);

@@ -8,6 +8,7 @@ export { default as HistoryPage } from "./HistoryPage";
 export { default as HomePage } from "./HomePage";
 export { default as LocationPage } from "./LocationPage";
 export { default as MaintainRefDataPage } from "./MaintainRefDataPage";
+export { default as MaintainGalleryPage } from "./MaintainGalleryPage";
 export { default as MaintainMemberPage } from "./MaintainMemberPage";
 export { default as MaintainOfficerPage } from "./MaintainOfficerPage";
 export { default as MaintainCommitteePage } from "./MaintainCommitteePage";

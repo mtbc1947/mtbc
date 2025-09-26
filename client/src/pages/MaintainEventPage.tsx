@@ -209,7 +209,7 @@ function validateEvent(event: EventRecord | null | undefined): ValidationResult 
     setSelectedItems([]);
   };
 
-  const handleUpload = async (file: File) => {
+  const handleUploadCSV = async (file: File) => {
     try {
       setValidationErrors([]);
       setImportSuccessMsg(null);
@@ -267,7 +267,7 @@ function validateEvent(event: EventRecord | null | undefined): ValidationResult 
           onDelete={handleDeleteSelected}
           onSave={handleSave}
           onCancel={handleCancel}
-          onUpload={handleUpload}
+          onUploadCSV={handleUploadCSV}
         />
       }
       listPanel={

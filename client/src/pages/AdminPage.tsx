@@ -140,6 +140,14 @@ const AdminPage: React.FC = () => {
           >
             Maintain Member
           </Link>
+
+          <Link
+            to="/maintainGallery"
+            state={{ skipAuth: true, adminName }}
+            className="block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Maintain Gallery Photos
+          </Link>
           
           {/* change 6 on ChangeControl List 22/8/25
           <Link
