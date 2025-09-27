@@ -32,7 +32,8 @@ const MaintainGalleryPage: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const [importSuccessMsg, setImportSuccessMsg] = useState<string | null>(null);
-  const [folderUploadProgress, setFolderUploadProgress] = useState<number>(0);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadTarget, setUploadTarget] = useState<number>(0);
   
   // Load gallery data on mount
   useEffect(() => {
@@ -198,11 +199,12 @@ const MaintainGalleryPage: React.FC = () => {
       }
       setImportSuccessMsg(null);
       const uploadErrors: string[] = [];
+      setUploadTarget(files.length);
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const result = await importFile(file, selectedfolderName);
         if (!result.success) uploadErrors.push(file.name);
-        setFolderUploadProgress(Math.round(((i + 1) / files.length) * 100));
+        setUploadProgress(i+1);
       }
 
       setImportSuccessMsg(
@@ -213,7 +215,8 @@ const MaintainGalleryPage: React.FC = () => {
       setImportSuccessMsg("Upload failed");
     } finally {
       // ✅ Always reset so the progress bar disappears for the next upload
-      setFolderUploadProgress(0);
+      setUploadProgress(0);
+      setUploadTarget(0);
 }
   };
 
@@ -250,7 +253,8 @@ const MaintainGalleryPage: React.FC = () => {
             onCancel={handleCancel}
             onUploadFile={handleUploadFile}
             onUploadFolder={handleUploadFolder}
-            folderUploadProgress={folderUploadProgress}
+            uploadProgress={uploadProgress}
+            uploadTarget={uploadTarget}
           />
         }
         listPanel={

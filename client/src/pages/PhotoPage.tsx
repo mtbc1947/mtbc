@@ -33,7 +33,7 @@ export default function PhotoPage() {
   if (loading) return <p>Loading…</p>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px-80px)]">
+    <div className="flex flex-col items-center py-10 min-h-[calc(100vh-80px-80px)]">
       {!selectedGallery ? (
         <div className="w-full max-w-5xl mx-auto">
           {galleries.length > 0 ? (

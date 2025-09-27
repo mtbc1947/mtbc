@@ -13,7 +13,8 @@ interface CommandsProps {
   onUploadCSV?: (file: File) => Promise<void>;
   onUploadFile?: (file: File) => Promise<void>;
   onUploadFolder?: (files: File[]) => Promise<void>;
-  folderUploadProgress?: number; // 0 or undefined means idle
+  uploadProgress?: number; // 0 or undefined means idle
+  uploadTarget?: number;
 }
 
 export function Commands({
@@ -28,7 +29,8 @@ export function Commands({
   onUploadCSV,
   onUploadFile,
   onUploadFolder,
-  folderUploadProgress,
+  uploadProgress,
+  uploadTarget,
 }: CommandsProps) {
   const navigate = useNavigate();
 
@@ -105,7 +107,7 @@ export function Commands({
 
   // 🔑 Disable all command buttons while a folder upload is in progress
   const buttonsDisabled =
-    folderUploadProgress !== undefined && folderUploadProgress > 0;
+    uploadProgress !== undefined && uploadProgress > 0;
 
   return (
     <>
@@ -247,25 +249,25 @@ export function Commands({
                     onChange={handleFolderChange}
                     style={{ display: "none" }}
                   />
-
-                  {folderUploadProgress !== undefined && folderUploadProgress > 0 && (
-                    <div className="w-full mb-2">
+                  {uploadProgress !== undefined &&
+                  uploadProgress > 0 &&
+                  uploadTarget !== undefined && (
+                    <div className="w-full mb-2 flex items-center justify-between gap-2">
                       {/* Progress bar */}
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-yellow-500 h-2 rounded transition-all"
+                          className="bg-yellow-500 h-2 rounded-full transition-all"
                           style={{
-                            width: `${folderUploadProgress}%`,
+                            width: `${Math.round((uploadProgress / uploadTarget) * 100)}%`,
                           }}
                         />
                       </div>
-                      {/* Percentage */}
-                      <p className="text-xs text-center text-gray-700">
-                        {folderUploadProgress}%
+                      {/* n/m display */}
+                      <p className="text-xs text-gray-700 min-w-[50px] text-right">
+                        {uploadProgress}/{uploadTarget}
                       </p>
                     </div>
                   )}
-
                 </>
               )}
             </>
@@ -301,8 +303,13 @@ export function Commands({
           <p className="text-sm font-medium text-gray-700 mb-1">Go To:</p>
           <button
             onClick={handleMenuClick}
-            className="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
-          >
+            disabled={buttonsDisabled}
+            className={`w-full py-2 rounded ${
+              buttonsDisabled
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-yellow-500 text-white hover:bg-yellow-600"
+            }`}
+                      >
             Menu
           </button>
         </div>
