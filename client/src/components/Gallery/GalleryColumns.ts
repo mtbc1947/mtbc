@@ -8,21 +8,14 @@ export function getGalleryColumns(): ColumnDescriptor<GalleryRecord>[] {
       label: "Folder Name",
       align: "center",
       optional: false,
-      render: (value, item) => outFormFolderName(value || ""), // <-- display-friendly
+      render: (value: string | undefined) => outFormFolderName(value || ""), // display-friendly
     },
     {
       key: "title",
       label: "Title",
       align: "center",
       optional: false,
-      render: (value) => value || "",
-    },
-    {
-      key: "cover",
-      label: "Cover Url",
-      align: "center",
-      optional: true,
-      render: (value) => value || "",
+      render: (value: string | undefined) => value || "",
     },
   ];
 }

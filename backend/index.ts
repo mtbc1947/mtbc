@@ -121,7 +121,6 @@ app.post(
 app.get("/health", (req, res) => res.send("OK"));
 
 app.get("/test", (req, res) => {
-  console.log("Got /test", { headers: req.headers, body: req.body });
   res.set(
     "Cache-Control",
     "no-store, no-cache, must-revalidate, proxy-revalidate"

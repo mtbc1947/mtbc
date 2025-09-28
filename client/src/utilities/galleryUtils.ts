@@ -1,4 +1,5 @@
 // utilities/galleryUtils.ts
+import { GalleryImage, Photo } from "../types/galleryTypes";
 
 export interface GalleryRecord {
     _id?: string;
@@ -7,12 +8,6 @@ export interface GalleryRecord {
     cover?: string;
     description?: string;
     photos?:string[];
-}
-
-export interface GalleryImage {
-  url: string;
-  name: string;
-  thumbnail?: string;
 }
 
 export interface UploadImageResult {
@@ -210,7 +205,8 @@ export const getGalleryImages = async (folderName: string): Promise<GalleryImage
         .filter((f) => f.fileType === "image")
         .map((f) => ({
             url: f.url,
-            name: f.name,
+            fileId: f.fileId,
+            filename: f.filename,
             thumbnail: f.thumbnail,
         }));
         return images; // may be []
@@ -219,3 +215,48 @@ export const getGalleryImages = async (folderName: string): Promise<GalleryImage
         return [];
     }
 };
+
+/**
+ * Requests backend to delete a photo from ImageKit.
+ * Expects the backend to handle deletion via ImageKit API.
+ */
+
+export const deletePhotoFromImageKit = async (photo: GalleryImage): Promise<void> => {
+  console.log("deletePhotoFromImageKit");
+
+  // We expect `photo.name` to contain the ImageKit fileId
+  if (!photo.fileId) throw new Error("Photo fileId (name) is required to delete a photo.");
+
+  const url = `${import.meta.env.VITE_BACKEND_URL}/image/${encodeURIComponent(photo.fileId)}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Failed to delete photo: ${errorText}`);
+    }
+  } catch (err) {
+    throw new Error(`deletePhotoFromImageKit error: ${err}`);
+  }
+};
+// utilities/galleryUtils.ts
+export const mapGalleryImageToPhoto = (image: GalleryImage, folder?: string): Photo => {
+  const fileId = image.fileId || image.url; // fallback if no fileId
+  const url = image.url;
+  const thumbnail = image.url.includes("ik.imagekit.io")
+    ? `${image.url}?tr=w-300,h-300,fo-center` // auto square thumbnail
+    : image.url;
+
+  return {
+    fileId,
+    url,
+    filename: image.filename,
+    folder,
+    thumbnail,
+  };
+};
+
+

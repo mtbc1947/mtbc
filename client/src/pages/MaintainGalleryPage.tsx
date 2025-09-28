@@ -7,35 +7,45 @@ import backgroundImage from "../assets/green1.jpg";
 import { useAuth } from "../auth/AuthContext";
 import { toast } from "react-toastify";
 
-import { GalleryRecord } from "../utilities/galleryUtils";
+import { GalleryRecord, mapGalleryImageToPhoto } from "../utilities/galleryUtils";
 import { getGalleryColumns } from "../components/Gallery/GalleryColumns";
 import EditFormArea from "../components/Gallery/GalleryEditFormArea";
+import { ThumbnailPanel } from "../components/Gallery/Thumbnail";
+import { GalleryImage, Photo } from "../types/galleryTypes";
 import {
   createGallery,
   updateGallery,
   deleteGallery,
   getAllGallery,
+  getGalleryImages,
   importFile,
-} from "utilities"; // adjust path as needed
+  deletePhotoFromImageKit,
+} from "../utilities";
 import { useConfirmDialog } from "../hooks/useConfirmDialog";
 
 const MaintainGalleryPage: React.FC = () => {
   const { confirm, dialog } = useConfirmDialog();
   const { isAuthenticated } = useAuth();
 
+  /** ==================== State ==================== */
   const [gallery, setGallery] = useState<GalleryRecord[]>([]);
   const [selectedItems, setSelectedItems] = useState<GalleryRecord[]>([]);
-  const [isNewEdit, setIsNewEdit] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [itemBeingEdited, setItemBeingEdited] = useState<GalleryRecord | null>(null);
+  const [isNewEdit, setIsNewEdit] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
+  const [photosMode, setPhotosMode] = useState(false);
+
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [selectedThumbnails, setSelectedThumbnails] = useState<Photo[]>([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const [importSuccessMsg, setImportSuccessMsg] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [uploadTarget, setUploadTarget] = useState<number>(0);
-  
-  // Load gallery data on mount
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTarget, setUploadTarget] = useState(0);
+
+  /** ==================== Load Data ==================== */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -49,6 +59,7 @@ const MaintainGalleryPage: React.FC = () => {
     fetchData();
   }, []);
 
+  /** ==================== Helpers ==================== */
   const isSelected = (item: GalleryRecord) =>
     selectedItems.some((i) => i._id === item._id);
 
@@ -60,20 +71,6 @@ const MaintainGalleryPage: React.FC = () => {
     );
   };
 
-  interface ValidationResult {
-    valid: boolean;
-    error?: string;
-  }
-
-  function validateGallery(gallery: GalleryRecord | null | undefined): ValidationResult {
-    if (!gallery) return { valid: false, error: "Gallery is missing." };
-    if (!gallery.folderName || gallery.folderName.trim() === "")
-      return { valid: false, error: "Gallery folder name is required." };
-    if (!gallery.title || gallery.title.trim() === "")
-      return { valid: false, error: "Gallery title is required." };
-    return { valid: true };
-  }
-
   const newGallery: GalleryRecord = {
     title: "",
     folderName: "",
@@ -81,12 +78,30 @@ const MaintainGalleryPage: React.FC = () => {
     photos: [],
   };
 
+  const validateGallery = (g: GalleryRecord | null) => {
+    if (!g) return { valid: false, error: "Gallery is missing." };
+    if (!g.folderName?.trim()) return { valid: false, error: "Folder name is required." };
+    if (!g.title?.trim()) return { valid: false, error: "Gallery title is required." };
+    return { valid: true };
+  };
+
+  const resetState = () => {
+    setEditMode(false);
+    setPhotosMode(false);
+    setItemBeingEdited(null);
+    setSelectedItems([]);
+    setPhotos([]);
+    setSelectedThumbnails([]);
+  };
+
+  /** ==================== Gallery Handlers ==================== */
   const handleCreate = () => {
     if (!isAuthenticated) return;
     setItemBeingEdited(newGallery);
     setIsNewEdit(true);
     setSelectedItems([]);
     setEditMode(true);
+    setPhotosMode(false);
   };
 
   const handleEditSelected = () => {
@@ -94,45 +109,35 @@ const MaintainGalleryPage: React.FC = () => {
     setItemBeingEdited(selectedItems[0]);
     setIsNewEdit(false);
     setEditMode(true);
+    setPhotosMode(false);
   };
 
-  const handleDeleteSelected = async (): Promise<void> => {
+  const handleDeleteSelected = async () => {
     if (!isAuthenticated || selectedItems.length === 0) return;
 
     const shouldDelete = await confirm({
-      title: "Delete Item",
-      message: "Are you sure you want to delete this item?",
+      title: "Delete Gallery",
+      message: "Are you sure you want to delete this gallery?",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
     });
-
     if (!shouldDelete) return;
 
-    const itemToDelete = selectedItems[0];
-    if (!itemToDelete) return;
-
     try {
+      const itemToDelete = selectedItems[0];
       await deleteGallery(itemToDelete);
+      setGallery((prev) => prev.filter((g) => g._id !== itemToDelete._id));
       toast.success("Gallery deleted successfully");
-      setGallery((prev) => prev.filter((e) => e._id !== itemToDelete._id));
-    } catch (error) {
-      console.error("Delete failed:", error);
-      toast.error(`Delete failed: ${(error as Error).message}`);
+      resetState();
+    } catch (err) {
+      console.error("Delete failed:", err);
+      toast.error(`Delete failed: ${(err as Error).message}`);
     }
-
-    setEditMode(false);
-    setItemBeingEdited(null);
-    setSelectedItems([]);
-  };
-
-  const handleCancel = () => {
-    setEditMode(false);
-    setItemBeingEdited(null);
-    setSelectedItems([]);
   };
 
   const handleSave = async () => {
     if (!itemBeingEdited) return;
+
     const result = validateGallery(itemBeingEdited);
     if (!result.valid) {
       toast.error(result.error);
@@ -140,86 +145,116 @@ const MaintainGalleryPage: React.FC = () => {
     }
 
     try {
-      let savedItem: GalleryRecord;
-      if (isNewEdit) {
-        savedItem = await createGallery(itemBeingEdited);
-        toast.success("Gallery created successfully");
-      } else {
-        savedItem = await updateGallery(itemBeingEdited);
-        toast.success("Gallery updated successfully");
-      }
+      const saved = isNewEdit
+        ? await createGallery(itemBeingEdited)
+        : await updateGallery(itemBeingEdited);
 
       setGallery((prev) => {
-        const updated = prev.some((e) => e._id === savedItem._id)
-          ? prev.map((e) => (e._id === savedItem._id ? savedItem : e))
-          : [...prev, savedItem];
+        const exists = prev.some((g) => g._id === saved._id);
+        const updated = exists
+          ? prev.map((g) => (g._id === saved._id ? saved : g))
+          : [...prev, saved];
         return [...updated].sort((a, b) => a.folderName.localeCompare(b.folderName));
       });
 
-      setEditMode(false);
-      setItemBeingEdited(null);
-      setSelectedItems([]);
-    } catch (error) {
-      console.error("Save error:", error);
-      toast.error((error as Error).message || "Failed to save gallery");
+      toast.success(isNewEdit ? "Gallery created successfully" : "Gallery updated successfully");
+      resetState();
+    } catch (err) {
+      console.error("Save error:", err);
+      toast.error((err as Error).message || "Failed to save gallery");
+    }
+  };
+
+  /** ==================== Photo Handlers ==================== */
+  const handleOpenPhotos = async () => {
+    if (!selectedItems[0]) return;
+    setPhotosMode(true);
+    setEditMode(false);
+    setItemBeingEdited(null);
+
+    try {
+      const folder = selectedItems[0].folderName;
+      const result: GalleryImage[] = await getGalleryImages(folder);
+      const mappedPhotos: Photo[] = result.map((img) => mapGalleryImageToPhoto(img, folder));
+
+      setPhotos(mappedPhotos);
+      setSelectedThumbnails([]);
+    } catch (err) {
+      console.error("Failed to load photos:", err);
+      toast.error("Failed to load photos");
     }
   };
 
   const handleUploadFile = async (file: File) => {
-
-    try {
-      const selectedfolderName = selectedItems[0]?.folderName || "Error";
-      if (/\s/.test(selectedfolderName)) {
-        setImportSuccessMsg("Foldername invalid");
-        throw new Error("Folder name cannot contain spaces.");
-      }
-      setImportSuccessMsg(null);
-      const result = await importFile(file, selectedfolderName);
-      if (result.success) {
-        setImportSuccessMsg(`CSV imported successfully.`);
-      } else {
-        throw new Error("Upload failed (no records inserted)");
-      }
-    } catch (err: any) {
-      console.error("Upload file failed", err);
-      setImportSuccessMsg("Upload failed");
-      throw err;
-    }
+    if (!selectedItems[0]) return;
+    await importFile(file, selectedItems[0].folderName);
   };
 
   const handleUploadFolder = async (files: File[]) => {
-    console.log("page handleUploadFolder");
-    try {
-      const selectedfolderName = selectedItems[0]?.folderName || "Error";
-      if (/\s/.test(selectedfolderName)) {
-        setImportSuccessMsg("Foldername invalid");
-        throw new Error(
-          "Folder name cannot contain spaces. Please replace spaces with underscores."
-        );
-      }
-      setImportSuccessMsg(null);
-      const uploadErrors: string[] = [];
-      setUploadTarget(files.length);
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const result = await importFile(file, selectedfolderName);
-        if (!result.success) uploadErrors.push(file.name);
-        setUploadProgress(i+1);
-      }
-
-      setImportSuccessMsg(
-        `Files imported successfully with ${uploadErrors.length} errors.`
-      );
-    } catch (err: any) {
-      console.error("Upload folder failed", err);
-      setImportSuccessMsg("Upload failed");
-    } finally {
-      // ✅ Always reset so the progress bar disappears for the next upload
-      setUploadProgress(0);
-      setUploadTarget(0);
-}
+    if (!selectedItems[0]) return;
+    setUploadTarget(files.length);
+    for (let i = 0; i < files.length; i++) {
+      await importFile(files[i], selectedItems[0].folderName);
+      setUploadProgress(i + 1);
+    }
+    setUploadProgress(0);
+    setUploadTarget(0);
   };
 
+  const handleDeletePhotos = async () => {
+    if (selectedThumbnails.length === 0) return;
+
+    const shouldDelete = await confirm({
+      title: "Delete Photos",
+      message: `Delete ${selectedThumbnails.length} photo(s)?`,
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+    });
+    if (!shouldDelete) return;
+
+    try {
+      for (const photo of selectedThumbnails) {
+        await deletePhotoFromImageKit(photo);
+      }
+      setPhotos((prev) => prev.filter((p) => !selectedThumbnails.includes(p)));
+      setSelectedThumbnails([]);
+      toast.success("Selected photos deleted successfully");
+    } catch (err) {
+      console.error("Photo delete error:", err);
+      toast.error((err as Error).message || "Failed to delete photos");
+    }
+  };
+/** ==================== Set Cover Handler ==================== */
+  const handleSetCover = async () => {
+    // Ensure exactly one photo and a gallery are selected
+    if (selectedThumbnails.length !== 1 || !selectedItems[0]) return;
+
+    const photo = selectedThumbnails[0];
+    const galleryToUpdate = selectedItems[0];
+
+    try {
+      // Copy gallery and set the cover to the selected photo URL
+      const updatedGallery: GalleryRecord = {
+        ...galleryToUpdate,
+        cover: photo.url,
+      };
+
+      // Call your existing update function to persist to the backend
+      const savedGallery = await updateGallery(updatedGallery);
+
+      // Update local state
+      setGallery((prev) =>
+        prev.map((g) => (g._id === savedGallery._id ? savedGallery : g))
+      );
+
+      toast.success("Cover photo updated successfully!");
+    } catch (error) {
+      console.error("Set cover failed:", error);
+      toast.error(`Failed to set cover: ${(error as Error).message}`);
+    }
+  };
+
+  /** ==================== Render ==================== */
   if (!isAuthenticated) {
     return (
       <div className="p-8 text-center">
@@ -235,22 +270,27 @@ const MaintainGalleryPage: React.FC = () => {
         title="Maintain Gallery and Photos – Maidenhead Town Bowls Club"
         description="Admin interface for editing Galleries and uploading photos"
       />
-      <div>{dialog}</div>
+      {dialog}
 
       <MaintainPageLayout
         backgroundImage={backgroundImage as string}
         title="Maintain Gallery & Photos"
-        editMode={editMode}
+        editMode={editMode || photosMode}
         commands={
           <Commands
             editMode={editMode}
+            photoMode={photosMode}
             canEdit={selectedItems.length === 1 && isAuthenticated}
             canDelete={selectedItems.length > 0 && isAuthenticated}
+            canSetCover={selectedThumbnails.length === 1}
+            canDeletePhotos={selectedThumbnails.length > 0}
             onCreate={handleCreate}
             onEdit={handleEditSelected}
-            onDelete={handleDeleteSelected}
+            onDelete={editMode ? handleDeleteSelected : handleDeletePhotos}
             onSave={handleSave}
-            onCancel={handleCancel}
+            onCancel={resetState}
+            onSetCover={handleSetCover}
+            onOpenPhotos={handleOpenPhotos}
             onUploadFile={handleUploadFile}
             onUploadFolder={handleUploadFolder}
             uploadProgress={uploadProgress}
@@ -263,9 +303,7 @@ const MaintainGalleryPage: React.FC = () => {
             entities={gallery}
             selectedItems={selectedItems}
             onSelectItem={onSelectItem}
-            onSelectAll={(checked) =>
-              setSelectedItems(checked ? [...gallery] : [])
-            }
+            onSelectAll={(checked) => setSelectedItems(checked ? [...gallery] : [])}
             itemsPerPage={itemsPerPage}
             onItemsPerPageChange={setItemsPerPage}
             currentPage={currentPage}
@@ -279,6 +317,13 @@ const MaintainGalleryPage: React.FC = () => {
               item={itemBeingEdited}
               setItem={setItemBeingEdited}
               isNew={isNewEdit}
+            />
+          ) : photosMode ? (
+            <ThumbnailPanel
+              photos={photos}
+              selected={selectedThumbnails}
+              setSelected={setSelectedThumbnails}
+              currentCoverUrl={itemBeingEdited?.cover}   
             />
           ) : null
         }

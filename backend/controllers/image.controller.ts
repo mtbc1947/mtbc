@@ -44,3 +44,30 @@ export const getImageFolders = async (req: Request, res: Response): Promise<void
     res.status(500).json({ error: "Failed to retrieve folders" });
   }
 };
+
+/**
+ * DELETE /api/images/:fileId
+ * Deletes an image from ImageKit using its fileId (identifier).
+ */
+export async function deleteImage(req: Request, res: Response) {
+  const { fileId } = req.params;
+  console.log("image.controller deleteImage fileId=", fileId);
+  if (!fileId) {
+    return res.status(400).json({ error: "Missing fileId parameter." });
+  }
+
+  try {
+    await imagekit.deleteFile(fileId);
+    return res.status(200).json({
+      success: true,
+      message: `Image with fileId '${fileId}' deleted successfully.`,
+    });
+  } catch (error: any) {
+    console.error("Image deletion failed:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete image.",
+      error: error?.message || String(error),
+    });
+  }
+}
