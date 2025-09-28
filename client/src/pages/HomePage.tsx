@@ -21,7 +21,8 @@ const HomePage: React.FC = () => {
     };
     getData();
   }, []);
-
+  console.log("Home Page Strings");
+  console.log(strings);
   const wOpenHours = strings[0] || "MISSING"; // e.g., "10:00am"
   const wOpenDays = strings[1] || "MISSING"; // e.g., "7 days a week"
   const wGreenFees = strings[2] || "MISSING"; // e.g., "no green fees"
