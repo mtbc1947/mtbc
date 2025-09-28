@@ -27,6 +27,7 @@ const HomePage: React.FC = () => {
   const wGreenFees = strings[2] || "MISSING"; // e.g., "no green fees"
   const wOpenDay = strings[3] || "N"; // "Y" or "N"
   const wGreenOpen = strings[4] || "N";
+  
   const wOpenDayMkr = wOpenDay === "Y";
   const wGreenOpenMkr = wGreenOpen === "Y";
 
@@ -76,7 +77,7 @@ const HomePage: React.FC = () => {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none"
+            className="fixed left-30 bottom-10 z-50 pointer-events-none"
           >
             <img
               src={greenClosedImage}

@@ -11,7 +11,6 @@ const menuGroup1: MenuGroupIf[] = [
     items: [
       { label: "Home", to: "/" },
       { label: "About Us", to: "/aboutUs" },
-      { label: "Open", to: "/openDay" },
     ],
   },
   {
@@ -90,7 +89,7 @@ const Navbar: React.FC = () => {
                 menu={menu}
                 isMobile={false}
                 ref={(el: HTMLButtonElement | null) =>
-                  (topLevelRefs.current[idx] = el)
+                  {(topLevelRefs.current[idx] = el)}
                 }
               />
             ))}
@@ -105,7 +104,7 @@ const Navbar: React.FC = () => {
                   to={to}
                   className="hover:text-indigo-600"
                   role="menuitem"
-                  ref={(el) => (topLevelRefs.current[refIndex] = el)}
+                  ref={(el) => {(topLevelRefs.current[refIndex] = el)}}
                   onKeyDown={(e) => handleTopLevelKeyDown(e, refIndex)}
                 >
                   {labels[idx]}
@@ -121,7 +120,7 @@ const Navbar: React.FC = () => {
                   menu={menu}
                   isMobile={false}
                   ref={(el: HTMLButtonElement | null) =>
-                    (topLevelRefs.current[refIndex] = el)
+                    {(topLevelRefs.current[refIndex] = el)}
                   }
                 />
               );

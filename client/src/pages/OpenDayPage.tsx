@@ -19,10 +19,9 @@ const OpenDayPage: React.FC = () => {
   }, []);
 
   // Safely access strings with fallback empty strings
-console.log(strings);
-  const openDate = strings[1] ?? "";
-  const startTime = strings[4] ?? "";
-  const endTime = strings[0] ?? "";
+  const openDate = strings[0] ?? "";
+  const startTime = strings[1] ?? "";
+  const endTime = strings[2] ?? "";
 
 
   return (
@@ -45,7 +44,7 @@ console.log(strings);
           {/* Left side: text */}
           <div className="flex-1 flex flex-col justify-center ml-2 gap-2">
             <h1 className="text-3xl font-bold mb-2">Open Day 2025</h1>
-<div className="grid grid-cols-[auto_1fr] gap-x-2 text-lg items-center">
+              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-lg items-center">
 
               <div className="font-semibold">Where:</div>
               <div>Maidenhead Town Bowls Club</div>
@@ -85,7 +84,7 @@ console.log(strings);
             Bowls is a great game to play at all ages. You can enjoy it from day one just by playing with other members of the club, but you can take it
             to County or even National level if you wish.<br />
             Bowls is also a great way to meet people and we believe the social aspect of the sport to be very important.<br />
-            We would love to see you on. Free Tea/Coffee and biscuits will be available. The bar will be open.<br />
+            We would love to see you. Free Tea/Coffee and biscuits will be available. The bar will be open.<br />
             So come along and meet us and try your hand at bowls.<br />
             The Bowls Club is situated in Oaken Grove Recreation Park, car parking is available via the Oaken Grove entrance.
           </p>

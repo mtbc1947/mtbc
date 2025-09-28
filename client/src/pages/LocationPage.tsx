@@ -17,6 +17,7 @@ const LocationPage: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold mb-2">Maidenhead Town Bowling Club</h2>
           <address className="not-italic text-base">
+            Oaken Grove Recreation Park<br/>
             Oaken  Grove<br />
             Maidenhead<br />
             SL6 6HL

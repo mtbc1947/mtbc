@@ -58,8 +58,6 @@ export const createRefData = async (
     item: RefDataRecord
 ): Promise<RefDataRecord> => {
     const url = `${import.meta.env.VITE_BACKEND_URL}/refData`;
-    console.log("util/createRefData");
-    console.log(item);
 
     try {
         const res = await fetch(url, {
@@ -128,7 +126,6 @@ export const updateAllRefData = async (
  * Deletes a refData record by its refKey.
  */
 export const deleteRefData = async (refKey: string): Promise<void> => {
-    console.log(refKey);
     if (!refKey) throw new Error("refKey is required for deletion.");
 
     const url = `${import.meta.env.VITE_BACKEND_URL}/refData/${refKey}`;

@@ -22,7 +22,8 @@ export const getPageRefData = async (
         const wWebPage = req.params.webPage;
         const refData: RefDataDocument[] = await RefData.find({
             webPage: wWebPage,
-        });
+        })
+        .sort({ refKey: 1});
         console.log(
             "refData.controller, getPageRefData",
             wWebPage,
