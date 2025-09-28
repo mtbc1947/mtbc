@@ -21,6 +21,7 @@ const HomePage: React.FC = () => {
     };
     getData();
   }, []);
+  
   console.log("Home Page Strings");
   console.log(strings);
   const wOpenHours = strings[0] || "MISSING"; // e.g., "10:00am"

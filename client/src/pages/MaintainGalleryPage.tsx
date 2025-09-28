@@ -115,6 +115,15 @@ const MaintainGalleryPage: React.FC = () => {
   const handleDeleteSelected = async () => {
     if (!isAuthenticated || selectedItems.length === 0) return;
 
+    const itemToDelete = selectedItems[0];
+
+    // ✅ Fetch gallery images
+    const images = await getGalleryImages(itemToDelete.folderName);
+    if (images.length > 0) {
+      toast.error("Cannot delete: gallery is not empty");
+      return;
+    }
+
     const shouldDelete = await confirm({
       title: "Delete Gallery",
       message: "Are you sure you want to delete this gallery?",
@@ -124,7 +133,6 @@ const MaintainGalleryPage: React.FC = () => {
     if (!shouldDelete) return;
 
     try {
-      const itemToDelete = selectedItems[0];
       await deleteGallery(itemToDelete);
       setGallery((prev) => prev.filter((g) => g._id !== itemToDelete._id));
       toast.success("Gallery deleted successfully");
@@ -281,12 +289,12 @@ const MaintainGalleryPage: React.FC = () => {
             editMode={editMode}
             photoMode={photosMode}
             canEdit={selectedItems.length === 1 && isAuthenticated}
-            canDelete={selectedItems.length > 0 && isAuthenticated}
+            canDelete={selectedItems.length === 1 && isAuthenticated}
             canSetCover={selectedThumbnails.length === 1}
             canDeletePhotos={selectedThumbnails.length > 0}
             onCreate={handleCreate}
             onEdit={handleEditSelected}
-            onDelete={editMode ? handleDeleteSelected : handleDeletePhotos}
+            onDelete={selectedThumbnails.length > 0  ? handleDeletePhotos : handleDeleteSelected}
             onSave={handleSave}
             onCancel={resetState}
             onSetCover={handleSetCover}

@@ -49,30 +49,38 @@ export function Commands({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const folderInputRef = useRef<HTMLInputElement | null>(null);
 
-  // upload modal state
+  // key to force remount of folder input
+  const [folderInputKey, setFolderInputKey] = useState(0);
+
+  // upload modals
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
-  // allow folder upload
+  // folder confirmation modal
+  const [folderModalVisible, setFolderModalVisible] = useState(false);
+  const [pendingFolderFiles, setPendingFolderFiles] = useState<File[]>([]);
+  const [pendingFolderName, setPendingFolderName] = useState("");
+
   useEffect(() => {
     if (folderInputRef.current) {
       folderInputRef.current.setAttribute("webkitdirectory", "");
       folderInputRef.current.setAttribute("directory", "");
     }
-  }, []);
+  }, [folderInputKey]); // ensure attributes are set after remount
 
   const buttonsDisabled = uploadProgress > 0;
 
-  /** Helper to render a styled button */
-  const Btn = (
-    {
-      disabled,
-      label,
-      onClick,
-    }: { disabled?: boolean; label: string; onClick: () => void }
-  ) => (
+  const Btn = ({
+    disabled,
+    label,
+    onClick,
+  }: {
+    disabled?: boolean;
+    label: string;
+    onClick: () => void;
+  }) => (
     <button
       onClick={onClick}
       disabled={disabled}
@@ -86,8 +94,10 @@ export function Commands({
     </button>
   );
 
-  /** Upload helpers */
-  const startUpload = async (file: File, handler: (file: File) => Promise<void>) => {
+  const startUpload = async (
+    file: File,
+    handler: (file: File) => Promise<void>
+  ) => {
     setSelectedFileName(file.name);
     setModalVisible(true);
     setUploading(true);
@@ -114,19 +124,50 @@ export function Commands({
     e.target.value = "";
   };
 
-  const handleFolderChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onUploadFolder && e.target.files?.length) {
-      // Only top-level files (avoid nested subfolders)
-      const topLevelFiles = Array.from(e.target.files).filter((f) => {
-        const parts = f.webkitRelativePath.split("/");
-        return parts.length === 2;
-      });
-      await onUploadFolder(topLevelFiles);
+  /** Folder change handler shows confirmation modal instead of immediate upload */
+  const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onUploadFolder || !e.target.files?.length) return;
+
+    const topLevelFiles = Array.from(e.target.files).filter((f) => {
+      const parts = f.webkitRelativePath.split("/");
+      return parts.length === 2; // only top-level files
+    });
+
+    if (topLevelFiles.length) {
+      const firstPath = topLevelFiles[0].webkitRelativePath;
+      const folder = firstPath.split("/")[0];
+      setPendingFolderName(folder);
+      setPendingFolderFiles(topLevelFiles);
+      setFolderModalVisible(true);
     }
-    e.target.value = "";
+    // no need to reset here; we re-mount input on modal close
   };
 
-  /** Modal for upload progress */
+  /** Reset input by remounting */
+  const resetFolderInput = () => {
+    setFolderInputKey((k) => k + 1);
+  };
+
+  const startFolderUpload = () => {
+    setFolderModalVisible(false);
+    const files = pendingFolderFiles; // capture
+    setPendingFolderFiles([]);
+    resetFolderInput();
+
+    // Kick off upload AFTER closing modal
+    if (onUploadFolder) {
+      // not awaited so UI closes instantly
+      void onUploadFolder(files);
+    }
+  };
+
+
+  const cancelFolderUpload = () => {
+    setFolderModalVisible(false);
+    setPendingFolderFiles([]);
+    resetFolderInput();
+  };
+
   const UploadModal = () =>
     modalVisible && (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
@@ -147,7 +188,34 @@ export function Commands({
       </div>
     );
 
-  /** Rendered action sets */
+  const FolderConfirmModal = () =>
+    folderModalVisible && (
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
+          <h2 className="text-lg font-bold mb-3">Confirm Folder Upload</h2>
+          <p className="mb-2">
+            📂 <strong>{pendingFolderName}</strong>
+          </p>
+          <p className="mb-4">Files to upload: {pendingFolderFiles.length}</p>
+
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={cancelFolderUpload}
+              className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={startFolderUpload}
+              className="px-4 py-2 rounded bg-yellow-500 hover:bg-yellow-600 text-white"
+            >
+              Start
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+
   const EditActions = () => (
     <>
       {Btn({ disabled: buttonsDisabled, label: "Save", onClick: onSave })}
@@ -232,8 +300,12 @@ export function Commands({
             onClick: () => folderInputRef.current?.click(),
           })}
           <input
+            key={folderInputKey}               // 👈 re-mount to guarantee onChange
             ref={folderInputRef}
             type="file"
+            onClick={(e) => {
+              (e.target as HTMLInputElement).value = "";
+            }}
             onChange={handleFolderChange}
             style={{ display: "none" }}
           />
@@ -262,6 +334,7 @@ export function Commands({
   return (
     <>
       <UploadModal />
+      <FolderConfirmModal />
       <div className="bg-white bg-opacity-80 rounded-2xl shadow-lg p-4 w-full md:w-64 flex flex-col items-stretch">
         <h2 className="text-lg font-bold text-center text-gray-800 mb-4">Actions</h2>
 
